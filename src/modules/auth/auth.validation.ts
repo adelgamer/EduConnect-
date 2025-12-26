@@ -1,6 +1,6 @@
 import { body } from 'express-validator';
 
-export const userValidationSchema = [
+export const signupValidationSchema = [
     // firstName: Required, max 25 chars (matches @db.VarChar(25))
     body('firstName')
         .trim()
@@ -37,4 +37,19 @@ export const userValidationSchema = [
     body('bio')
         .optional({ checkFalsy: true })
         .isLength({ max: 200 }).withMessage('Bio cannot exceed 200 characters'),
+];
+
+export const loginValditionSchema = [
+    // email: Required, valid email format, max 254 chars (matches @db.VarChar(254))
+    body('email')
+        .trim()
+        .notEmpty().withMessage('Email is required')
+        .isEmail().withMessage('Invalid email format')
+        .isLength({ max: 254 }).withMessage('Email is too long')
+        .normalizeEmail(),
+
+    // password: Required, usually check for length (even if db is @db.Text)
+    body('password')
+        .notEmpty().withMessage('Password is required')
+        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
 ];

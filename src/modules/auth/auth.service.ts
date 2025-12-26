@@ -4,6 +4,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { sanitizeUser } from "../../helpers/user.helper.js";
 import { InternalServerError } from "../../../core/errors/InternalServerError.js";
+import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
+import { UnauthorizedExcpetion } from "../../../core/errors/UnauthorizedExcpetion copy.js";
 
 /**
  * Processes data to create a new auth.
@@ -40,6 +42,38 @@ export async function signup(data: any) {
     try {
         const accessToken = await jwt.sign({ userId: userToReturn.id }, process.env.ACCESS_TOKEN_SECRET_KEY || 'secret_key', { expiresIn: '15m' });
         const refreshToken = await jwt.sign({ userId: userToReturn.id }, process.env.REFRESH_TOKEN_SECRET_KEY || 'refresh_secret_key');
+
+        return {
+            user: userToReturn,
+            accessToken,
+            refreshToken
+        }
+    } catch (err) {
+        throw new InternalServerError('Internal server error', err);
+    }
+}
+
+/**
+ * Processes data to create a new auth.
+ */
+export async function login(data: any) {
+    // 1- Check if user with the provided email exists
+    let user = await prisma.user.findUnique({
+        where: {
+            email: data.email
+        }
+    });
+    if (!user) throw new NotFoundExcpetion('No user found with this email');
+    // 2- Comparing password hashs if they match
+    const isPasswordCorrect = await bcrypt.compare(data.password, user.passwordHash);
+    if (!isPasswordCorrect) throw new UnauthorizedExcpetion('Incorrect credentials');
+
+    // 3- Generate access and refresh token
+    try {
+        const accessToken = await jwt.sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET_KEY || 'secret_key', { expiresIn: "15m" });
+        const refreshToken = await jwt.sign({ userId: user.id }, process.env.REFRESH_TOKEN_SECRET_KEY || 'refresh_secret_key');
+
+        const userToReturn = sanitizeUser(user);
 
         return {
             user: userToReturn,
