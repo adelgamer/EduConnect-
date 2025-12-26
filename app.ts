@@ -3,12 +3,14 @@ import express from 'express';
 import mainRouter from './src/mainRouter.js';
 import { baseMiddleware } from './src/middlewares/base.middleware.js';
 import { globalErrorHandler } from './core/middlewares/globalErrorHandler.js';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const port = 3001;
 
 // Middlewares
 app.use(express.json());
+app.use(cookieParser());
 app.use(baseMiddleware);
 
 // Routes

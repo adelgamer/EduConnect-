@@ -18,9 +18,9 @@ const authRouter = express.Router();
 authRouter.post('/sign-up', signupValidationSchema, authController.signUpController);
 authRouter.post('/login', loginValditionSchema, authController.loginController);
 authRouter.post('/logout', authGuard, logoutValditionSchema, authController.logoutController);
-// authRouter.get('/protected-route', authGuard, (req, res) => {
-//     res.send('YOU ARE SEEING SOMETHING THAT SHOULD BE PROTECTED ' + req.user?.userId);
-// });
+authRouter.get('/protected-route', authGuard, (req, res) => {
+    res.send('YOU ARE SEEING SOMETHING THAT SHOULD BE PROTECTED ' + req.user?.userId);
+});
 
 
 export default authRouter;

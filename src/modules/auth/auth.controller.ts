@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { BadRequestExcpetion } from '../../../core/errors/BadRequestException.js';
 import * as authService from './auth.service.js';
+import { DefaultDeserializer } from 'node:v8';
 
 /**
  * POST /api/auths
@@ -25,7 +26,27 @@ export async function loginController(req: Request, res: Response) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) throw new BadRequestExcpetion('Validation failed', errors);
 
-    const data = await authService.login(req.body);
+    const data = await authService.login(req.body) as any;
+
+    // Returning data
+    if (process.env.IS_HTTP_COOKIE === 'true') {
+        res.cookie('accessToken', data.accessToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            maxAge: 15 * 60 * 1000 // 15m
+        })
+
+        res.cookie('refreshToken', data.refreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7d
+        })
+
+        delete data.accessToken;
+        delete data.refreshToken;
+    }
     res.status(201).json({
         success: true,
         message: "Logged in",
