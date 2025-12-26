@@ -1,0 +1,41 @@
+import express from 'express';
+import { checkSchema } from 'express-validator';
+import * as ${moduleName}Controller from './${moduleName}.controller.js';
+
+/**
+ * Express router for ${moduleNamePascal} module.
+ * Maps HTTP verbs to controller functions.
+ */
+const ${moduleName}Router = express.Router();
+
+/**
+ * @route   GET /api/${moduleName}s
+ * @desc    Retrieve all ${moduleNamePascal}s
+ */
+${moduleName}Router.get('/', ${moduleName}Controller.get${moduleNamePascal}sController);
+
+/**
+ * @route   GET /api/${moduleName}s/:id
+ * @desc    Retrieve a single ${moduleNamePascal} by ID
+ */
+${moduleName}Router.get('/:id', ${moduleName}Controller.get${moduleNamePascal}ByIdController);
+
+/**
+ * @route   POST /api/${moduleName}s
+ * @desc    Create a new ${moduleNamePascal}
+ */
+${moduleName}Router.post('/', ${moduleName}Controller.create${moduleNamePascal}Controller);
+
+/**
+ * @route   PUT /api/${moduleName}s/:id
+ * @desc    Update an existing ${moduleNamePascal}
+ */
+${moduleName}Router.put('/:id', ${moduleName}Controller.update${moduleNamePascal}Controller);
+
+/**
+ * @route   DELETE /api/${moduleName}s/:id
+ * @desc    Delete a ${moduleNamePascal} record
+ */
+${moduleName}Router.delete('/:id', ${moduleName}Controller.delete${moduleNamePascal}Controller);
+
+export default ${moduleName}Router;

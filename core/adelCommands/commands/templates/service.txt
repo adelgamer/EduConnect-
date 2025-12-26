@@ -1,0 +1,35 @@
+
+/**
+ * Fetches all ${moduleNamePascal} data.
+ */
+export async function getAll() {
+    return "List of all ${moduleNamePascal}s retrieved from the service.";
+}
+
+/**
+ * Fetches a single ${moduleNamePascal} by ID.
+ */
+export async function getById(id: string) {
+    return `${moduleNamePascal} with ID: \${id\} retrieved from the service.`;
+}
+
+/**
+ * Processes data to create a new ${moduleNamePascal}.
+ */
+export async function create(data: any) {
+    return "${moduleNamePascal} data processed and created successfully.";
+}
+
+/**
+ * Processes data to update an existing ${moduleNamePascal}.
+ */
+export async function update(id: string, data: any) {
+    return "${moduleNamePascal} with ID: \${id\} updated successfully.";
+}
+
+/**
+ * Performs the deletion of a ${moduleNamePascal} record.
+ */
+export async function remove(id: string) {
+    return "${moduleNamePascal} with ID: \${id\} deleted successfully.";
+}

@@ -1,0 +1,79 @@
+import { Request, Response } from 'express';
+import { validationResult } from 'express-validator';
+import { BadRequestExcpetion } from '../../../core/errors/BadRequestException.js';
+import * as ${moduleName}Service from './${moduleName}.service.js';
+
+/**
+ * GET /api/${moduleName}s
+ */
+export async function get${moduleNamePascal}sController(req: Request, res: Response) {
+    const data = await ${moduleName}Service.getAll();
+    res.json({
+        success: true,
+        message: "${moduleNamePascal}s retrieved successfully",
+        data
+    });
+}
+
+/**
+ * GET /api/${moduleName}s/:id
+ */
+export async function get${moduleNamePascal}ByIdController(req: Request, res: Response) {
+    const id = req.params.id;
+    if (!id) throw new BadRequestExcpetion('Identification ID is required');
+
+    const data = await ${moduleName}Service.getById(id);
+    res.json({
+        success: true,
+        message: "${moduleNamePascal} retrieved successfully",
+        data
+    });
+}
+
+/**
+ * POST /api/${moduleName}s
+ */
+export async function create${moduleNamePascal}Controller(req: Request, res: Response) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) throw new BadRequestExcpetion('Validation failed', errors);
+
+    const data = await ${moduleName}Service.create(req.body);
+    res.status(201).json({
+        success: true,
+        message: "${moduleNamePascal} created successfully",
+        data
+    });
+}
+
+/**
+ * PUT /api/${moduleName}s/:id
+ */
+export async function update${moduleNamePascal}Controller(req: Request, res: Response) {
+    const id = req.params.id;
+    const errors = validationResult(req);
+    
+    if (!id) throw new BadRequestExcpetion('Identification ID is required');
+    if (!errors.isEmpty()) throw new BadRequestExcpetion('Validation failed', errors);
+
+    const data = await ${moduleName}Service.update(id, req.body);
+    res.json({
+        success: true,
+        message: "${moduleNamePascal} updated successfully",
+        data
+    });
+}
+
+/**
+ * DELETE /api/${moduleName}s/:id
+ */
+export async function delete${moduleNamePascal}Controller(req: Request, res: Response) {
+    const id = req.params.id;
+    if (!id) throw new BadRequestExcpetion('Identification ID is required');
+
+    const data = await ${moduleName}Service.remove(id);
+    res.json({
+        success: true,
+        message: "${moduleNamePascal} deleted successfully",
+        data
+    });
+}
