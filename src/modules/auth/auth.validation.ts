@@ -53,3 +53,10 @@ export const loginValditionSchema = [
         .notEmpty().withMessage('Password is required')
         .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
 ];
+
+export const logoutValditionSchema = [
+    // email: Required, valid email format, max 254 chars (matches @db.VarChar(254))
+    body('refreshToken')
+        .trim()
+        .notEmpty().withMessage('Refresh token is required')
+];

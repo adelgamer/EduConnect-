@@ -6,6 +6,7 @@ import { sanitizeUser } from "../../helpers/user.helper.js";
 import { InternalServerError } from "../../../core/errors/InternalServerError.js";
 import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
 import { UnauthorizedExcpetion } from "../../../core/errors/UnauthorizedExcpetion copy.js";
+import { Request } from "express";
 
 /**
  * Processes data to create a new auth.
@@ -41,7 +42,16 @@ export async function signup(data: any) {
     // 5- Generate access and refresh token
     try {
         const accessToken = await jwt.sign({ userId: userToReturn.id }, process.env.ACCESS_TOKEN_SECRET_KEY || 'secret_key', { expiresIn: '15m' });
-        const refreshToken = await jwt.sign({ userId: userToReturn.id }, process.env.REFRESH_TOKEN_SECRET_KEY || 'refresh_secret_key');
+        const refreshToken = await jwt.sign({ userId: userToReturn.id }, process.env.REFRESH_TOKEN_SECRET_KEY || 'refresh_secret_key', { expiresIn: '7d' });
+
+        // Store refresh token in the database
+        await prisma.refreshToken.create({
+            data: {
+                userId: user.id,
+                token: refreshToken,
+                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            }
+        })
 
         return {
             user: userToReturn,
@@ -71,7 +81,16 @@ export async function login(data: any) {
     // 3- Generate access and refresh token
     try {
         const accessToken = await jwt.sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET_KEY || 'secret_key', { expiresIn: "15m" });
-        const refreshToken = await jwt.sign({ userId: user.id }, process.env.REFRESH_TOKEN_SECRET_KEY || 'refresh_secret_key');
+        const refreshToken = await jwt.sign({ userId: user.id }, process.env.REFRESH_TOKEN_SECRET_KEY || 'refresh_secret_key', { expiresIn: '7d' });
+
+        // Store refresh token in the database
+        await prisma.refreshToken.create({
+            data: {
+                userId: user.id,
+                token: refreshToken,
+                expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+            }
+        })
 
         const userToReturn = sanitizeUser(user);
 
@@ -83,4 +102,23 @@ export async function login(data: any) {
     } catch (err) {
         throw new InternalServerError('Internal server error', err);
     }
+}
+
+/**
+ * Processes data to create a new auth.
+ */
+export async function logout(userId: string, data: any) {
+    // 1- Check if user exists
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundExcpetion('User is not found');
+
+    // 2- Check if refresh token exists in db
+    console.log('Refresh token', data.refreshToken);
+    const token = await prisma.refreshToken.findUnique({ where: { token: data.refreshToken } });
+    if (!token) throw new NotFoundExcpetion('Refresh token not found');
+
+    // 3- Delete refresh token from the database
+    await prisma.refreshToken.delete({ where: { token: data.refreshToken } });
+
+    return null;
 }

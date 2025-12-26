@@ -32,3 +32,18 @@ export async function loginController(req: Request, res: Response) {
         data
     });
 }
+
+/**
+ * POST /api/auths
+ */
+export async function logoutController(req: Request, res: Response) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) throw new BadRequestExcpetion('Validation failed', errors);
+
+    const data = await authService.logout(req.user!.userId, req.body);
+    res.status(201).json({
+        success: true,
+        message: "Logged in",
+        data
+    });
+}
