@@ -6,3 +6,27 @@ generator client {
 datasource db {
   provider = "mysql"
 }
+
+// | Field          | Description             |
+// | -------------- | ----------------------- |
+// | profile_photo  | Profile image path      |
+// | field_of_study | Faculty / field         |
+// | degree_system  | LMD / Engineering       |
+// | academic_year  | L1, L2, L3, M1, M2, PhD |
+// | created_at     | Account creation date   |
+// | updated_at     | Last update             |
+
+model User {
+  id           String  @id @default(uuid())
+  firstName    String  @db.VarChar(25)
+  lastName     String  @db.VarChar(25)
+  username     String  @unique @db.VarChar(25)
+  email        String  @unique @db.VarChar(254)
+  passwordHash String  @db.Text
+  bio          String? @db.VarChar(200)
+
+  profilePhoto String? @db.VarChar(2048)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
