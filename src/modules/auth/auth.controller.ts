@@ -3,6 +3,7 @@ import { validationResult } from 'express-validator';
 import { BadRequestExcpetion } from '../../../core/errors/BadRequestException.js';
 import * as authService from './auth.service.js';
 import { DefaultDeserializer } from 'node:v8';
+import { UnauthorizedExcpetion } from '../../../core/errors/UnauthorizedExcpetion copy.js';
 
 /**
  * POST /api/auths
@@ -78,6 +79,35 @@ export async function logoutAllDevicesController(req: Request, res: Response) {
     res.status(201).json({
         success: true,
         message: "Logged out from all devices",
+        data
+    });
+}
+
+/**
+ * POST /api/auths
+ */
+export async function refreshTokenController(req: Request, res: Response) {
+
+    const refreshToken: string | undefined = req.cookies.refreshToken;
+    if (!refreshToken) throw new UnauthorizedExcpetion('New refresh token')
+
+    let data: string | null = await authService.refreshToken(refreshToken);
+
+    // Returning data
+    if (process.env.IS_HTTP_COOKIE === 'true') {
+        res.cookie('accessToken', data, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            maxAge: 15 * 60 * 1000 // 15m
+        })
+
+        data = null
+    }
+
+    res.status(201).json({
+        success: true,
+        message: "Token refreshed",
         data
     });
 }

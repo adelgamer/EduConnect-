@@ -19,6 +19,7 @@ authRouter.post('/sign-up', signupValidationSchema, authController.signUpControl
 authRouter.post('/login', loginValditionSchema, authController.loginController);
 authRouter.post('/logout', authGuard, logoutValditionSchema, authController.logoutController);
 authRouter.post('/logout-all-devices', authGuard, authController.logoutAllDevicesController);
+authRouter.post('/refresh-token', authController.refreshTokenController);
 authRouter.get('/protected-route', authGuard, (req, res) => {
     res.send('YOU ARE SEEING SOMETHING THAT SHOULD BE PROTECTED ' + req.user?.userId);
 });

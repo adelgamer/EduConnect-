@@ -1,7 +1,7 @@
 import prisma from "../../../core/databaseClient/prismaClient/prismaClient.js";
 import { ConflictException } from "../../../core/errors/ConflictException.js";
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { sanitizeUser } from "../../helpers/user.helper.js";
 import { InternalServerError } from "../../../core/errors/InternalServerError.js";
 import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
@@ -138,4 +138,31 @@ export async function logoutAllDevices(userId: string) {
     await prisma.refreshToken.deleteMany({ where: { userId } });
 
     return null;
+}
+
+/**
+ * Processes data to create a new auth.
+ */
+export async function refreshToken(refreshToken: string) {
+    let accessToken;
+    let user: JwtPayload & { userId: string };
+    // 1- Check refresh token validity
+    try {
+        user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET_KEY || 'refresh_secret_key') as JwtPayload & { userId: string };
+    }
+    catch (err) {
+        throw new UnauthorizedExcpetion('Invalid refresh token')
+    }
+    // 2- Check its existence in the database
+    const refreshTokenFromDb = prisma.refreshToken.findUnique({ where: { token: refreshToken } });
+    if (!refreshTokenFromDb) throw new UnauthorizedExcpetion('Invalid refresh token')
+
+    // 3- If exists Issue another access token
+    try {
+        accessToken = jwt.sign({ userId: user.userId }, process.env.ACCESS_TOKEN_SECRET_KEY || 'secret_key', { expiresIn: "15m" });
+    } catch (err) {
+        throw new InternalServerError('Internal server error');
+    }
+
+    return accessToken;
 }
