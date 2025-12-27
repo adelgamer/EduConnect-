@@ -10,32 +10,207 @@ import { create${moduleNamePascal}ValidationSchema, update${moduleNamePascal}Val
 const ${moduleName}Router = express.Router();
 
 /**
- * @route   GET /api/${moduleName}s
- * @desc    Retrieve all ${moduleNamePascal}s
+ * @swagger
+ * tags:
+ *   name: ${moduleNamePascal}
+ *   description: ${moduleNamePascal} management and retrieval
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     ${moduleNamePascal}:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The ${moduleName} ID
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Creation timestamp
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Last update timestamp
+ */
+
+/**
+ * @swagger
+ * /${moduleName}:
+ *   get:
+ *     summary: Retrieve all ${moduleNamePascal}s
+ *     tags: [${moduleNamePascal}]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of ${moduleNamePascal}s retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: ${moduleName}s retrieved successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/${moduleNamePascal}'
  */
 ${moduleName}Router.get('/', ${moduleName}Controller.get${moduleNamePascal}sController);
 
 /**
- * @route   GET /api/${moduleName}s/:id
- * @desc    Retrieve a single ${moduleNamePascal} by ID
+ * @swagger
+ * /${moduleName}/{id}:
+ *   get:
+ *     summary: Retrieve a single ${moduleNamePascal} by ID
+ *     tags: [${moduleNamePascal}]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ${moduleName} ID
+ *     responses:
+ *       200:
+ *         description: ${moduleNamePascal} retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: ${moduleName} retrieved successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/${moduleNamePascal}'
+ *       404:
+ *         description: ${moduleNamePascal} not found
  */
 ${moduleName}Router.get('/:id', ${moduleName}Controller.get${moduleNamePascal}ByIdController);
 
 /**
- * @route   POST /api/${moduleName}s
- * @desc    Create a new ${moduleNamePascal}
+ * @swagger
+ * /${moduleName}:
+ *   post:
+ *     summary: Create a new ${moduleNamePascal}
+ *     tags: [${moduleNamePascal}]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               # Add properties here
+ *               exampleProperty:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: ${moduleNamePascal} created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: ${moduleName} created successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/${moduleNamePascal}'
  */
 ${moduleName}Router.post('/', create${moduleNamePascal}ValidationSchema, ${moduleName}Controller.create${moduleNamePascal}Controller);
 
 /**
- * @route   PUT /api/${moduleName}s/:id
- * @desc    Update an existing ${moduleNamePascal}
+ * @swagger
+ * /${moduleName}/{id}:
+ *   put:
+ *     summary: Update an existing ${moduleNamePascal}
+ *     tags: [${moduleNamePascal}]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ${moduleName} ID to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               # Add properties here
+ *               exampleProperty:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: ${moduleNamePascal} updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: ${moduleName} updated successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/${moduleNamePascal}'
  */
 ${moduleName}Router.put('/:id', update${moduleNamePascal}ValidationSchema, ${moduleName}Controller.update${moduleNamePascal}Controller);
 
 /**
- * @route   DELETE /api/${moduleName}s/:id
- * @desc    Delete a ${moduleNamePascal} record
+ * @swagger
+ * /${moduleName}/{id}:
+ *   delete:
+ *     summary: Delete a ${moduleNamePascal} record
+ *     tags: [${moduleNamePascal}]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ${moduleName} ID to delete
+ *     responses:
+ *       200:
+ *         description: ${moduleNamePascal} deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: ${moduleName} deleted successfully
  */
 ${moduleName}Router.delete('/:id', ${moduleName}Controller.delete${moduleNamePascal}Controller);
 

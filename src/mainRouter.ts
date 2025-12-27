@@ -1,4 +1,3 @@
-import testModuleRouter from './modules/testModule/testModule.route.js';
 import postRouter from './modules/post/post.route.js';
 import userRouter from './modules/user/user.route.js';
 import authRouter from './modules/auth/auth.route.js';
