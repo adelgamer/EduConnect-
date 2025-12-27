@@ -1,0 +1,17 @@
+import { body } from 'express-validator';
+
+export const create${moduleNamePascal}ValidationSchema = [
+    // example:
+    // body('title')
+    //     .trim()
+    //     .notEmpty().withMessage('Title is required')
+    //     .isLength({ max: 255 }).withMessage('Title cannot exceed 255 characters'),
+];
+
+export const update${moduleNamePascal}ValidationSchema = [
+    // example:
+    // body('title')
+    //     .trim()
+    //     .notEmpty().withMessage('Title is required')
+    //     .isLength({ max: 255 }).withMessage('Title cannot exceed 255 characters'),
+];

@@ -1,6 +1,7 @@
 import express from 'express';
 import { checkSchema } from 'express-validator';
 import * as ${moduleName}Controller from './${moduleName}.controller.js';
+import { create${moduleNamePascal}ValidationSchema, update${moduleNamePascal}ValidationSchema } from './${moduleName}.validation.js';
 
 /**
  * Express router for ${moduleNamePascal} module.
@@ -24,13 +25,13 @@ ${moduleName}Router.get('/:id', ${moduleName}Controller.get${moduleNamePascal}By
  * @route   POST /api/${moduleName}s
  * @desc    Create a new ${moduleNamePascal}
  */
-${moduleName}Router.post('/', ${moduleName}Controller.create${moduleNamePascal}Controller);
+${moduleName}Router.post('/', create${moduleNamePascal}ValidationSchema, ${moduleName}Controller.create${moduleNamePascal}Controller);
 
 /**
  * @route   PUT /api/${moduleName}s/:id
  * @desc    Update an existing ${moduleNamePascal}
  */
-${moduleName}Router.put('/:id', ${moduleName}Controller.update${moduleNamePascal}Controller);
+${moduleName}Router.put('/:id', update${moduleNamePascal}ValidationSchema, ${moduleName}Controller.update${moduleNamePascal}Controller);
 
 /**
  * @route   DELETE /api/${moduleName}s/:id

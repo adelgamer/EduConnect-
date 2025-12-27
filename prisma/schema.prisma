@@ -45,15 +45,6 @@ model RefreshToken {
   updatedAt DateTime @updatedAt()
 }
 
-// | Field          | Description                  |
-// | -------------- | ---------------------------- |
-// | subject        | Subject name                 |
-// | field_of_study | Faculty                      |
-// | academic_year  | Target year                  |
-// | created_at     | Creation date                |
-// | updated_at     | Last update                  |
-// | is_deleted     | Soft delete                  |
-
 enum PostType {
   QUESTION
   ANSWER

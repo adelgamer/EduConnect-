@@ -49,3 +49,10 @@ export function createRouter(commandArg) {
 
     fs.writeFileSync(`./src/modules/${commandArg}/${commandArg}.route.ts`, routeText);
 }
+
+export function createValidation(commandArg) {
+    const validationText = fs.readFileSync('./core/adelCommands/commands/templates/validation.txt', 'utf8')
+        .replace(/\${moduleNamePascal}/g, convertToPascalCase(commandArg));
+
+    fs.writeFileSync(`./src/modules/${commandArg}/${commandArg}.validation.ts`, validationText);
+}
