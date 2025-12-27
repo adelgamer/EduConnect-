@@ -57,3 +57,11 @@ export const validateGetAllQuery = [
         .withMessage('Limit must be between 1 and 100')
         .toInt()
 ];
+
+
+export const updateUserPasswordValidationSchema = [
+    // Page validation: Must be an integer, minimum 1
+    body('password')
+        .notEmpty().withMessage('Password is required')
+        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
+];

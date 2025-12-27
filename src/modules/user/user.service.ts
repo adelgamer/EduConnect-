@@ -2,6 +2,8 @@ import prisma from "../../../core/databaseClient/prismaClient/prismaClient.js";
 import { ConflictException } from "../../../core/errors/ConflictException.js";
 import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
 import { UnauthorizedExcpetion } from "../../../core/errors/UnauthorizedExcpetion copy.js";
+import bycrypt from 'bcrypt'
+import { sanitizeUser } from "../../helpers/user.helper.js";
 
 /**
  * Fetches all user data.
@@ -76,4 +78,29 @@ export async function update(actorId: string, id: string, data: any) {
     })
 
     return updatedUser;
+}
+
+/**
+ * Processes data to update an existing user.
+ */
+export async function updatePassword(actorId: string, data: any) {
+    // 1- Check if user exists
+    const user = await prisma.user.findUnique({ where: { id: actorId } });
+    if (!user) throw new NotFoundExcpetion('User not found');
+
+    // 2- Hash the password
+    const salt = process.env.PASSWORD_HASHING_ROUNDS ? parseInt(process.env.PASSWORD_HASHING_ROUNDS, 10) : 10;
+    const hashed = await bycrypt.hash(data.password, salt);
+
+    // 3- Update password
+    await prisma.user.update({
+        where: {
+            id: actorId
+        },
+        data: {
+            passwordHash: hashed
+        }
+    })
+
+    return sanitizeUser(user);
 }

@@ -1,7 +1,7 @@
 import express from 'express';
 import { checkSchema } from 'express-validator';
 import * as userController from './user.controller.js';
-import { updateUserValidationSchema, validateGetAllQuery } from './user.validation.js';
+import { updateUserPasswordValidationSchema, updateUserValidationSchema, validateGetAllQuery } from './user.validation.js';
 import { authGuard } from '../../middlewares/auth.middleware.js';
 
 /**
@@ -22,6 +22,12 @@ userRouter.get('/', validateGetAllQuery, userController.getusersController);
  * @desc    Retrieve a single user by ID
  */
 userRouter.get('/:id', userController.getuserByIdController);
+
+/**
+ * @route   PUT /api/users/:id/password
+ * @desc    Update an existing user
+ */
+userRouter.put('/update-password', updateUserPasswordValidationSchema, userController.updateUserPasswordController);
 
 /**
  * @route   PUT /api/users/:id
