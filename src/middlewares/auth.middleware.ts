@@ -14,8 +14,6 @@ export function authGuard(req: Request, res: Response, next: Function) {
         if (!accessToken || !accessToken.split(" ")[1]) throw new UnauthorizedExcpetion('Unauthorized');
         accessToken = accessToken.split(" ")[1];
     }
-
-    console.log('JWT', accessToken);
     try {
         const user = jwt.verify(accessToken as string, process.env.ACCESS_TOKEN_SECRET_KEY || 'secret_key') as JwtPayload & { userId: string };
         req.user = user;

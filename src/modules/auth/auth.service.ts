@@ -113,12 +113,29 @@ export async function logout(userId: string, data: any) {
     if (!user) throw new NotFoundExcpetion('User is not found');
 
     // 2- Check if refresh token exists in db
-    console.log('Refresh token', data.refreshToken);
     const token = await prisma.refreshToken.findUnique({ where: { token: data.refreshToken } });
     if (!token) throw new NotFoundExcpetion('Refresh token not found');
 
     // 3- Delete refresh token from the database
     await prisma.refreshToken.delete({ where: { token: data.refreshToken } });
+
+    return null;
+}
+
+/**
+ * Processes data to create a new auth.
+ */
+export async function logoutAllDevices(userId: string) {
+    // 1- Check if user exists
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundExcpetion('User is not found');
+
+    // 2- Check if refresh token exists in db
+    const token = await prisma.refreshToken.findMany({ where: { userId } });
+    if (token.length === 0) throw new NotFoundExcpetion('Refresh token not found');
+
+    // 3- Delete refresh token from the database
+    await prisma.refreshToken.deleteMany({ where: { userId } });
 
     return null;
 }

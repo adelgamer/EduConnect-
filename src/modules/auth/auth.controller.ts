@@ -64,7 +64,20 @@ export async function logoutController(req: Request, res: Response) {
     const data = await authService.logout(req.user!.userId, req.body);
     res.status(201).json({
         success: true,
-        message: "Logged in",
+        message: "Logged out",
+        data
+    });
+}
+
+/**
+ * POST /api/auths
+ */
+export async function logoutAllDevicesController(req: Request, res: Response) {
+
+    const data = await authService.logoutAllDevices(req.user!.userId);
+    res.status(201).json({
+        success: true,
+        message: "Logged out from all devices",
         data
     });
 }
