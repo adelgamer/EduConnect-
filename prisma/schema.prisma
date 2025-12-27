@@ -30,6 +30,7 @@ model User {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt()
   refreshTokens RefreshToken[]
+  posts         post[]
 }
 
 model RefreshToken {
@@ -40,6 +41,44 @@ model RefreshToken {
   token     String   @unique
   expiresAt DateTime
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+// | Field          | Description                  |
+// | -------------- | ---------------------------- |
+// | subject        | Subject name                 |
+// | field_of_study | Faculty                      |
+// | academic_year  | Target year                  |
+// | created_at     | Creation date                |
+// | updated_at     | Last update                  |
+// | is_deleted     | Soft delete                  |
+
+enum PostType {
+  QUESTION
+  ANSWER
+  ANNOUNCEMENT
+  STUDY_TIP
+  EXPLANATION
+  RESOURCE
+  PDF_RESOURCE
+  SUMMARY
+  AI_SUMMARY
+  AI_QUESTION
+  POLL
+  DISCUSSION
+  EVENT
+}
+
+model post {
+  id       String   @id @default(uuid())
+  userId   String
+  User     User     @relation(fields: [userId], references: [id])
+  title    String?  @db.VarChar(150)
+  content  String   @db.Text
+  postType PostType @default(DISCUSSION)
+
+  isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
 }
