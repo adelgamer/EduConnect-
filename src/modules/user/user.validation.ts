@@ -1,4 +1,4 @@
-import { body } from 'express-validator';
+import { body, query } from 'express-validator';
 
 export const updateUserValidationSchema = [
     // firstName: Required, max 25 chars (matches @db.VarChar(25))
@@ -37,4 +37,23 @@ export const updateUserValidationSchema = [
     body('bio')
         .optional({ checkFalsy: true })
         .isLength({ max: 200 }).withMessage('Bio cannot exceed 200 characters'),
+];
+
+
+export const validateGetAllQuery = [
+    // Page validation: Must be an integer, minimum 1
+    query('cursor')
+        .optional()
+        .trim()
+        .isString()
+        .withMessage('Cursor must be a string'),
+
+    // Limit validation: Must be an integer, between 1 and 100
+    // We cap the limit to prevent users from requesting 1 million rows at once (DoS protection)
+    query('limit')
+        .optional()
+        .trim()
+        .isInt({ min: 1, max: 100 })
+        .withMessage('Limit must be between 1 and 100')
+        .toInt()
 ];

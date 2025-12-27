@@ -6,8 +6,29 @@ import { UnauthorizedExcpetion } from "../../../core/errors/UnauthorizedExcpetio
 /**
  * Fetches all user data.
  */
-export async function getAll() {
-    return "List of all users retrieved from the service.";
+export async function getAll(cursor: string, limit: number) {
+
+    const query: any = {
+        take: limit + 1,
+        orderBy: {
+            id: 'asc'
+        }
+    }
+    if (cursor) {
+        query.cursor = { id: cursor };
+    }
+
+    const users = await prisma.user.findMany(query);
+
+    let hasNextPage: boolean = false;
+    let nextCursor: string | null = null;
+    if (users.length > limit) {
+        hasNextPage = true;
+        nextCursor = users[limit].id;
+        users.pop();
+    };
+
+    return { users, pagination: { hasNextPage, nextCursor, count: users.length } };
 }
 
 /**
@@ -19,13 +40,6 @@ export async function getById(id: string) {
     if (!user) throw new NotFoundExcpetion('User not found');
 
     return user;
-}
-
-/**
- * Processes data to create a new user.
- */
-export async function create(data: any) {
-    return "user data processed and created successfully.";
 }
 
 /**
@@ -62,11 +76,4 @@ export async function update(actorId: string, id: string, data: any) {
     })
 
     return updatedUser;
-}
-
-/**
- * Performs the deletion of a user record.
- */
-export async function remove(id: string) {
-    return "user with ID: \${id\} deleted successfully.";
 }
