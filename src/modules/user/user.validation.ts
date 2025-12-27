@@ -1,6 +1,6 @@
 import { body } from 'express-validator';
 
-export const signupValidationSchema = [
+export const updateUserValidationSchema = [
     // firstName: Required, max 25 chars (matches @db.VarChar(25))
     body('firstName')
         .trim()
@@ -21,42 +21,20 @@ export const signupValidationSchema = [
         .matches(/^[a-zA-Z0-9_]+$/).withMessage('Username can only contain letters, numbers, and underscores'),
 
     // email: Required, valid email format, max 254 chars (matches @db.VarChar(254))
-    body('email')
-        .trim()
-        .notEmpty().withMessage('Email is required')
-        .isEmail().withMessage('Invalid email format')
-        .isLength({ max: 254 }).withMessage('Email is too long')
-        .normalizeEmail(),
+    // body('email')
+    //     .trim()
+    //     .notEmpty().withMessage('Email is required')
+    //     .isEmail().withMessage('Invalid email format')
+    //     .isLength({ max: 254 }).withMessage('Email is too long')
+    //     .normalizeEmail(),
 
-    // password: Required, usually check for length (even if db is @db.Text)
-    body('password')
-        .notEmpty().withMessage('Password is required')
-        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
+    // // password: Required, usually check for length (even if db is @db.Text)
+    // body('password')
+    //     .notEmpty().withMessage('Password is required')
+    //     .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
 
     // bio: Optional, max 200 chars (matches @db.VarChar(200))
     body('bio')
         .optional({ checkFalsy: true })
         .isLength({ max: 200 }).withMessage('Bio cannot exceed 200 characters'),
-];
-
-export const loginValditionSchema = [
-    // email: Required, valid email format, max 254 chars (matches @db.VarChar(254))
-    body('email')
-        .trim()
-        .notEmpty().withMessage('Email is required')
-        .isEmail().withMessage('Invalid email format')
-        .isLength({ max: 254 }).withMessage('Email is too long')
-        .normalizeEmail(),
-
-    // password: Required, usually check for length (even if db is @db.Text)
-    body('password')
-        .notEmpty().withMessage('Password is required')
-        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
-];
-
-export const logoutValditionSchema = [
-    // email: Required, valid email format, max 254 chars (matches @db.VarChar(254))
-    body('refreshToken')
-        .trim()
-        .notEmpty().withMessage('Refresh token is required')
 ];

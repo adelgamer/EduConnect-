@@ -51,11 +51,11 @@ export async function createuserController(req: Request, res: Response) {
 export async function updateuserController(req: Request, res: Response) {
     const id = req.params.id;
     const errors = validationResult(req);
-    
+
     if (!id) throw new BadRequestExcpetion('Identification ID is required');
     if (!errors.isEmpty()) throw new BadRequestExcpetion('Validation failed', errors);
 
-    const data = await userService.update(id, req.body);
+    const data = await userService.update(req.user!.userId, id, req.body);
     res.json({
         success: true,
         message: "user updated successfully",
