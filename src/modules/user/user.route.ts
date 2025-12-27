@@ -184,4 +184,4 @@ userRouter.put('/update-password', updateUserPasswordValidationSchema, userContr
 userRouter.put('/:id', upload.single('profileImageFile'), updateUserValidationSchema, userController.updateUserController);
 
 
-export default userRouter;
+export default userRouter; 
