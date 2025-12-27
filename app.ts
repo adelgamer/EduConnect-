@@ -36,9 +36,18 @@ export const swaggerOptions: Options = {
                 url: `http://localhost:${port}`,
             },
         ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                },
+            },
+        },
     },
     // Path to the API docs (where your route files are)
-    apis: ['./src/modules/*.ts'],
+    apis: ['./src/modules/**/*.ts'],
 };
 const specs = swaggerJsdoc(swaggerOptions);
 app.use(process.env.SWAGGER_ENDPOINT ?? '/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
