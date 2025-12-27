@@ -71,12 +71,14 @@ enum PostType {
 }
 
 model post {
-  id       String   @id @default(uuid())
-  userId   String
-  User     User     @relation(fields: [userId], references: [id])
-  title    String?  @db.VarChar(150)
-  content  String   @db.Text
-  postType PostType @default(DISCUSSION)
+  id            String   @id @default(uuid())
+  userId        String
+  User          User     @relation(fields: [userId], references: [id])
+  title         String?  @db.VarChar(150)
+  content       String   @db.Text
+  postType      PostType @default(DISCUSSION)
+  reactionCount Int      @default(0)
+  commentCount  Int      @default(0)
 
   isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
