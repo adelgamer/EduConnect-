@@ -1,12 +1,15 @@
 import express from 'express';
 import { checkSchema } from 'express-validator';
 import * as postController from './post.controller.js';
+import { createPostValidationSchema } from './post.validation.js';
+import { authGuard } from '../../middlewares/auth.middleware.js';
 
 /**
  * Express router for Post module.
  * Maps HTTP verbs to controller functions.
  */
 const postRouter = express.Router();
+postRouter.use(authGuard);
 
 /**
  * @route   GET /api/posts
@@ -24,7 +27,7 @@ postRouter.get('/:id', postController.getPostByIdController);
  * @route   POST /api/posts
  * @desc    Create a new Post
  */
-postRouter.post('/', postController.createPostController);
+postRouter.post('/', createPostValidationSchema, postController.createPostController);
 
 /**
  * @route   PUT /api/posts/:id

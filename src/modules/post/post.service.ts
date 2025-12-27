@@ -1,3 +1,4 @@
+import prisma from "../../../core/databaseClient/prismaClient/prismaClient.js";
 
 /**
  * Fetches all Post data.
@@ -16,8 +17,10 @@ export async function getById(id: string) {
 /**
  * Processes data to create a new Post.
  */
-export async function create(data: any) {
-    return "Post data processed and created successfully.";
+export async function create(userId: string, data: any) {
+    data.userId = userId;
+    const post = await prisma.post.create({ data });
+    return post;
 }
 
 /**
