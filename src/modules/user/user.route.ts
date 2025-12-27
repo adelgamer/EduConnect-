@@ -3,6 +3,7 @@ import { checkSchema } from 'express-validator';
 import * as userController from './user.controller.js';
 import { updateUserPasswordValidationSchema, updateUserValidationSchema, validateGetAllQuery } from './user.validation.js';
 import { authGuard } from '../../middlewares/auth.middleware.js';
+import instanciateMulter from '../../../core/multer/multerIntance.js';
 
 /**
  * Express router for user module.
@@ -16,7 +17,7 @@ const userRouter = express.Router();
  *   name: User
  *   description: User management and retrieval
  */
-
+const upload = instanciateMulter('./uploads/profileImages');
 userRouter.use(authGuard);
 
 /**
@@ -145,10 +146,13 @@ userRouter.put('/update-password', updateUserPasswordValidationSchema, userContr
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
+ *               profileImageFile:
+ *                 type: string
+ *                 format: binary
  *               firstName:
  *                 type: string
  *                 maxLength: 25
@@ -177,7 +181,7 @@ userRouter.put('/update-password', updateUserPasswordValidationSchema, userContr
  *                 data:
  *                   $ref: '#/components/schemas/User'
  */
-userRouter.put('/:id', updateUserValidationSchema, userController.updateuserController);
+userRouter.put('/:id', upload.single('profileImageFile'), updateUserValidationSchema, userController.updateUserController);
 
 
 export default userRouter;

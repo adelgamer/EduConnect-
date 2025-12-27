@@ -4,6 +4,8 @@ import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
 import { UnauthorizedExcpetion } from "../../../core/errors/UnauthorizedExcpetion copy.js";
 import bycrypt from 'bcrypt'
 import { sanitizeUser } from "../../helpers/user.helper.js";
+import { BadRequestExcpetion } from "../../../core/errors/BadRequestException.js";
+import { User } from "../../../generated/prisma/client.js";
 
 /**
  * Fetches all user data.
@@ -47,7 +49,7 @@ export async function getById(id: string) {
 /**
  * Processes data to update an existing user.
  */
-export async function update(actorId: string, id: string, data: any) {
+export async function update(actorId: string, id: string, data: any, profileImage: Express.Multer.File | undefined) {
     // 1- Check if user is updating himself
     if (actorId !== id) throw new UnauthorizedExcpetion('Can\'t update another user');
 
@@ -66,15 +68,22 @@ export async function update(actorId: string, id: string, data: any) {
     })
     if (usersWithSameUsername.length > 0) throw new ConflictException('Username already exists');
 
-    // 4- Update user informations
+    // 4- Check if profileImage is an image
+    let profileImageUrl: string | null = null;
+    if (profileImage && (profileImage.mimetype !== 'image/jpeg' || profileImage.size / (1024 * 1024) > 2)) throw new BadRequestExcpetion('Profile image is not an image less then 2mb');
+    if (profileImage) profileImageUrl = profileImage.path.replaceAll('\\', '/');
+
+    // 5- Update user informations
+    const dataToUpdate: Partial<User> = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        username: data.username,
+        bio: data.bio,
+    }
+    if (profileImageUrl) dataToUpdate.profilePhoto = profileImageUrl;
     const updatedUser = await prisma.user.update({
         where: { id },
-        data: {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            username: data.username,
-            bio: data.bio,
-        }
+        data: dataToUpdate
     })
 
     return updatedUser;
