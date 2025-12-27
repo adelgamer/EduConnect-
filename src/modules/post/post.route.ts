@@ -33,7 +33,7 @@ postRouter.post('/', createPostValidationSchema, postController.createPostContro
  * @route   PUT /api/posts/:id
  * @desc    Update an existing Post
  */
-postRouter.put('/:id', postController.updatePostController);
+postRouter.put('/:id', createPostValidationSchema, postController.updatePostController);
 
 /**
  * @route   DELETE /api/posts/:id
