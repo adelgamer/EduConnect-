@@ -12,7 +12,7 @@ export async function getAll(cursor: string, limit: number = 10) {
     }
     if (cursor) query.cursor = { id: cursor };
 
-    const posts = await prisma.user.findMany(query);
+    const posts = await prisma.post.findMany(query);
 
     let hasNextPage: boolean = false;
     let nextCursor: string | null = null;
