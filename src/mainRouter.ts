@@ -1,3 +1,4 @@
+import reactionRouter from './modules/reaction/reaction.route.js';
 import postRouter from './modules/post/post.route.js';
 import userRouter from './modules/user/user.route.js';
 import authRouter from './modules/auth/auth.route.js';
@@ -8,5 +9,6 @@ const mainRouter = express.Router();
 mainRouter.use('/auth', authRouter);
 mainRouter.use('/user', userRouter);
 mainRouter.use('/post', postRouter);
+mainRouter.use('/reaction', reactionRouter);
 
 export default mainRouter;

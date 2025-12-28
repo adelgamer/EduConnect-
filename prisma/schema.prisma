@@ -30,7 +30,8 @@ model User {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt()
   refreshTokens RefreshToken[]
-  posts         post[]
+  posts         Post[]
+  reactions     Reaction[]
 }
 
 model RefreshToken {
@@ -61,7 +62,7 @@ enum PostType {
   EVENT
 }
 
-model post {
+model Post {
   id            String   @id @default(uuid())
   userId        String
   User          User     @relation(fields: [userId], references: [id])
@@ -71,7 +72,35 @@ model post {
   reactionCount Int      @default(0)
   commentCount  Int      @default(0)
 
-  isDeleted Boolean  @default(false)
+  isDeleted Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt()
+  reactions Reaction[]
+}
+
+enum ReactableType {
+  POST
+  COMMENT
+}
+
+enum ReactionType {
+  LIKE
+  HELPFUL
+  EASY
+  TOUGH
+  FIRE
+  MIND_BLOWN
+}
+
+model Reaction {
+  id           String       @id @default(uuid())
+  userId       String
+  User         User         @relation(fields: [userId], references: [id])
+  reactionType ReactionType @default(LIKE)
+
+  postId String?
+  post   Post?   @relation(fields: [postId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
 }
