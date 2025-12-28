@@ -3,6 +3,7 @@ import { checkSchema } from 'express-validator';
 import * as postController from './post.controller.js';
 import { createPostValidationSchema } from './post.validation.js';
 import { authGuard } from '../../middlewares/auth.middleware.js';
+import { validateGetAllQuery } from '../user/user.validation.js';
 
 /**
  * Express router for Post module.
@@ -15,7 +16,7 @@ postRouter.use(authGuard);
  * @route   GET /api/posts
  * @desc    Retrieve all Posts
  */
-postRouter.get('/', postController.getPostsController);
+postRouter.get('/', validateGetAllQuery, postController.getPostsController);
 
 /**
  * @route   GET /api/posts/:id

@@ -5,8 +5,26 @@ import { UnauthorizedExcpetion } from "../../../core/errors/UnauthorizedExcpetio
 /**
  * Fetches all Post data.
  */
-export async function getAll() {
-    return "List of all Posts retrieved from the service.";
+export async function getAll(cursor: string, limit: number = 10) {
+    const query: any = {
+        take: limit + 1,
+        orderBy: { id: 'asc' }
+    }
+    if (cursor) query.cursor = { id: cursor };
+
+    const posts = await prisma.user.findMany(query);
+
+    let hasNextPage: boolean = false;
+    let nextCursor: string | null = null;
+    if (posts.length > limit) {
+        hasNextPage = true;
+        nextCursor = posts[limit].id;
+        posts.pop();
+    }
+
+    return {
+        posts, pagination: { hasNextPage, nextCursor, count: posts.length }
+    };
 }
 
 /**

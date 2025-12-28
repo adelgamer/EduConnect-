@@ -7,7 +7,11 @@ import * as postService from './post.service.js';
  * GET /api/posts
  */
 export async function getPostsController(req: Request, res: Response) {
-    const data = await postService.getAll();
+
+    const cursor: string | undefined = req.query.cursor as string;
+    const limit: number = req.query.limit ? parseInt(req.query.limit as string) : 10;
+
+    const data = await postService.getAll(cursor, limit);
     res.json({
         success: true,
         message: "Posts retrieved successfully",
