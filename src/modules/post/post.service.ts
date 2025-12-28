@@ -33,10 +33,13 @@ export async function update(actorId: string, id: string, data: any) {
     const post = await prisma.post.findUnique({ where: { id } });
     if (!post) throw new NotFoundExcpetion('Post not found');
 
-    // 1- Checking if user owns the post
+    // 2- Checking if user owns the post
     if (post.userId !== actorId) throw new UnauthorizedExcpetion('You don\'t have permission to edit this post');
 
-    // 3- Updating the post
+    // 3- Check if post alread deleted
+    if (post.isDeleted) throw new NotFoundExcpetion('Post not found');
+
+    // 4- Updating the post
     const updatedPost = await prisma.post.update({
         where: { id },
         data
@@ -48,6 +51,20 @@ export async function update(actorId: string, id: string, data: any) {
 /**
  * Performs the deletion of a Post record.
  */
-export async function remove(id: string) {
-    return "Post with ID: \${id\} deleted successfully.";
+export async function remove(actorId: string, id: string) {
+    // 1- Checking if post exists
+    const post = await prisma.post.findUnique({ where: { id: id } });
+    if (!post) throw new NotFoundExcpetion('Post not Found');
+
+    // 2- Checking if user owns the post
+    if (actorId !== post.userId) throw new UnauthorizedExcpetion('You don\'t have permission to edit this post');
+
+    // 3- Check if post alread deleted
+    if (post.isDeleted) throw new NotFoundExcpetion('Post not found');
+
+    // 4- Soft deleting post
+    await prisma.post.update({ where: { id }, data: { isDeleted: true } });
+    post.isDeleted = true;
+
+    return post;
 }

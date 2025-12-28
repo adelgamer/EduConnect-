@@ -70,7 +70,7 @@ export async function deletePostController(req: Request, res: Response) {
     const id = req.params.id;
     if (!id) throw new BadRequestExcpetion('Identification ID is required');
 
-    const data = await postService.remove(id);
+    const data = await postService.remove(req.user!.userId, id);
     res.json({
         success: true,
         message: "Post deleted successfully",
