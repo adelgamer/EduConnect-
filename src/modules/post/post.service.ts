@@ -2,6 +2,12 @@ import prisma from "../../../core/databaseClient/prismaClient/prismaClient.js";
 import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
 import { UnauthorizedExcpetion } from "../../../core/errors/UnauthorizedExcpetion copy.js";
 
+export async function checkPostExists(postId: string) {
+    const post = await prisma.post.findUnique({ where: { id: postId } });
+    if (!post || (post && post.isDeleted)) throw new NotFoundExcpetion('Post not found');
+    return post;
+}
+
 /**
  * Fetches all Post data.
  */

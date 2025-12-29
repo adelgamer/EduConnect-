@@ -2,12 +2,14 @@ import express from 'express';
 import { checkSchema } from 'express-validator';
 import * as commentController from './comment.controller.js';
 import { createCommentValidationSchema, updateCommentValidationSchema } from './comment.validation.js';
+import { authGuard } from '../../middlewares/auth.middleware.js';
 
 /**
  * Express router for Comment module.
  * Maps HTTP verbs to controller functions.
  */
 const commentRouter = express.Router();
+commentRouter.use(authGuard);
 
 /**
  * @swagger
@@ -136,7 +138,7 @@ commentRouter.get('/:id', commentController.getCommentByIdController);
  *                 data:
  *                   $ref: '#/components/schemas/Comment'
  */
-commentRouter.post('/', createCommentValidationSchema, commentController.createCommentController);
+commentRouter.post('/:postId', createCommentValidationSchema, commentController.createCommentController);
 
 /**
  * @swagger

@@ -1,11 +1,6 @@
 import prisma from "../../../core/databaseClient/prismaClient/prismaClient.js";
 import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
-
-async function checkPostExists(postId: string) {
-    const post = await prisma.post.findUnique({ where: { id: postId } });
-    if (!post || (post && post.isDeleted)) throw new NotFoundExcpetion('Post not found');
-    return post;
-}
+import { checkPostExists } from "../post/post.service.js";
 
 /**
  * Fetches all Reaction data.

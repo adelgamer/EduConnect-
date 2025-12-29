@@ -1,3 +1,5 @@
+import prisma from "../../../core/databaseClient/prismaClient/prismaClient.js";
+import { checkPostExists } from "../post/post.service.js";
 
 /**
  * Fetches all Comment data.
@@ -16,8 +18,14 @@ export async function getById(id: string) {
 /**
  * Processes data to create a new Comment.
  */
-export async function create(data: any) {
-    return "Comment data processed and created successfully.";
+export async function create(actorId: string, postId: string, data: any) {
+    // 1- Check if post exists
+    const post = await checkPostExists(postId);
+
+    // 2- Create comment
+    const comment = await prisma.comment.create({ data: { userId: actorId, postId, content: data.content } })
+
+    return comment;
 }
 
 /**
