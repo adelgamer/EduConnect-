@@ -32,6 +32,7 @@ model User {
   refreshTokens RefreshToken[]
   posts         Post[]
   reactions     Reaction[]
+  comments      Comment[]
 }
 
 model RefreshToken {
@@ -76,6 +77,7 @@ model Post {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt()
   reactions Reaction[]
+  comments  Comment[]
 }
 
 enum ReactableType {
@@ -100,6 +102,19 @@ model Reaction {
 
   postId String?
   post   Post?   @relation(fields: [postId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model Comment {
+  id        String  @id @default(uuid())
+  postId    String
+  post      Post    @relation(fields: [postId], references: [id])
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  content   String  @db.Text
+  isDeleted Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
