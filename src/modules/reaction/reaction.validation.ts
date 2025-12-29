@@ -1,4 +1,4 @@
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 import { ReactionType } from '../../../generated/prisma/enums.js';
 
 export const createReactionValidationSchema = [
@@ -18,4 +18,18 @@ export const updateReactionValidationSchema = [
     //     .trim()
     //     .notEmpty().withMessage('Title is required')
     //     .isLength({ max: 255 }).withMessage('Title cannot exceed 255 characters'),
+];
+
+export const getAllReactionsValidationShcema = [
+    // example:
+    param('id')
+        .trim()
+        .notEmpty().withMessage('Post id is required'),
+    // example:
+    query('cursor')
+        .optional().isString(),
+    // example:
+    query('limit')
+        .optional()
+        .isInt().withMessage('Limit must be an integer'),
 ];

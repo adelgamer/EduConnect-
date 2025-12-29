@@ -1,7 +1,7 @@
 import express from 'express';
 import { checkSchema } from 'express-validator';
 import * as reactionController from './reaction.controller.js';
-import { createReactionValidationSchema, updateReactionValidationSchema } from './reaction.validation.js';
+import { createReactionValidationSchema, getAllReactionsValidationShcema, updateReactionValidationSchema } from './reaction.validation.js';
 import { authGuard } from '../../middlewares/auth.middleware.js';
 
 /**
@@ -65,7 +65,7 @@ reactionRouter.use(authGuard);
  *                   items:
  *                     $ref: '#/components/schemas/Reaction'
  */
-reactionRouter.get('/', reactionController.getReactionsController);
+reactionRouter.get('/:postId', getAllReactionsValidationShcema, reactionController.getReactionsController);
 
 /**
  * @swagger

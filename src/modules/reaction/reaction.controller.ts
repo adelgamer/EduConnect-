@@ -7,7 +7,9 @@ import * as reactionService from './reaction.service.js';
  * GET /api/reactions
  */
 export async function getReactionsController(req: Request, res: Response) {
-    const data = await reactionService.getAll();
+    const cursor = req.params.cursor || null;
+    const limit: number = req.params.limit ? parseInt(req.params.limit) : 10;
+    const data = await reactionService.getAll(req.params.postId, cursor, limit);
     res.json({
         success: true,
         message: "Reactions retrieved successfully",

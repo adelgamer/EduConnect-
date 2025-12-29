@@ -4,8 +4,29 @@ import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
 /**
  * Fetches all Reaction data.
  */
-export async function getAll() {
-    return "List of all Reactions retrieved from the service.";
+export async function getAll(postId: string, cursor: string | null, limit: number = 10) {
+    // 1- Checking if post exists and not deleted
+    const post = await prisma.post.findUnique({ where: { id: postId } });
+    if (!post || (post && post.isDeleted)) throw new NotFoundExcpetion('Post not found');
+
+    // 2- Reteive reactions
+    const query: any = {
+        take: limit + 1,
+        orderBy: { id: 'asc' },
+        where: { postId }
+    }
+    if (cursor) query.cursor = { id: cursor };
+    const reactions = await prisma.reaction.findMany(query);
+
+    let hasNextPage: boolean = false;
+    let nextCursor: string | null = null;
+    if (reactions.length > limit) {
+        hasNextPage = true;
+        nextCursor = reactions[limit].id;
+        reactions.pop();
+    }
+
+    return { reactions, pagination: { hasNextPage, nextCursor, count: reactions.length } };
 }
 
 /**
@@ -25,7 +46,6 @@ export async function create(actorId: string, postId: string, data: any) {
     if (!post || (post && post.isDeleted)) throw new NotFoundExcpetion('Post not found');
 
     // 2- Check if reaction from the same actor exists
-    // const isSameActorReactionExists = post.reactions.find((reac) => reac.userId === actorId);
     const isSameActorReactionExists = await prisma.reaction.findFirst({ where: { userId: actorId, postId } });
 
     // 3- Reaction from same actor and same reaction remove reaction
