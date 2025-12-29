@@ -101,7 +101,7 @@ reactionRouter.get('/:postId', getAllReactionsValidationShcema, reactionControll
  *       404:
  *         description: Reaction not found
  */
-reactionRouter.get('/:id', reactionController.getReactionByIdController);
+reactionRouter.get('/:id/reaction', reactionController.getReactionByIdController);
 
 /**
  * @swagger

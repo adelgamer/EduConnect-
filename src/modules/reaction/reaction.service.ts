@@ -1,13 +1,18 @@
 import prisma from "../../../core/databaseClient/prismaClient/prismaClient.js";
 import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
 
+async function checkPostExists(postId: string) {
+    const post = await prisma.post.findUnique({ where: { id: postId } });
+    if (!post || (post && post.isDeleted)) throw new NotFoundExcpetion('Post not found');
+    return post;
+}
+
 /**
  * Fetches all Reaction data.
  */
 export async function getAll(postId: string, cursor: string | null, limit: number = 10) {
     // 1- Checking if post exists and not deleted
-    const post = await prisma.post.findUnique({ where: { id: postId } });
-    if (!post || (post && post.isDeleted)) throw new NotFoundExcpetion('Post not found');
+    const post = await checkPostExists(postId)
 
     // 2- Reteive reactions
     const query: any = {
@@ -33,7 +38,9 @@ export async function getAll(postId: string, cursor: string | null, limit: numbe
  * Fetches a single Reaction by ID.
  */
 export async function getById(id: string) {
-    return `Reaction with ID: \${id\} retrieved from the service.`;
+    const reaction = await prisma.reaction.findUnique({ where: { id } })
+    if (!reaction) throw new NotFoundExcpetion('Reaction not found');
+    return reaction;
 }
 
 /**
@@ -42,8 +49,7 @@ export async function getById(id: string) {
 export async function create(actorId: string, postId: string, data: any) {
     let reaction;
     // 1- Checking if post exists and not deleted
-    const post = await prisma.post.findUnique({ where: { id: postId } });
-    if (!post || (post && post.isDeleted)) throw new NotFoundExcpetion('Post not found');
+    const post = await checkPostExists(postId)
 
     // 2- Check if reaction from the same actor exists
     const isSameActorReactionExists = await prisma.reaction.findFirst({ where: { userId: actorId, postId } });
