@@ -85,13 +85,13 @@ export async function create(actorId: string, postId: string, data: any) {
 /**
  * Processes data to update an existing Reaction.
  */
-export async function update(id: string, data: any) {
-    return "Reaction with ID: \${id\} updated successfully.";
-}
+// export async function update(id: string, data: any) {
+//     return "Reaction with ID: \${id\} updated successfully.";
+// }
 
 /**
  * Performs the deletion of a Reaction record.
  */
-export async function remove(id: string) {
-    return "Reaction with ID: \${id\} deleted successfully.";
-}
+// export async function remove(id: string) {
+//     return "Reaction with ID: \${id\} deleted successfully.";
+// }
