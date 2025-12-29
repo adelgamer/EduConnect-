@@ -28,6 +28,16 @@ reactionRouter.use(authGuard);
  *         id:
  *           type: string
  *           description: The reaction ID
+ *         userId:
+ *           type: string
+ *           description: The ID of the user who reacted
+ *         postId:
+ *           type: string
+ *           description: The ID of the post reacted to
+ *         reactionType:
+ *           type: string
+ *           enum: [LIKE, HELPFUL, EASY, TOUGH, FIRE, MIND_BLOWN]
+ *           description: The type of reaction
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -40,15 +50,35 @@ reactionRouter.use(authGuard);
 
 /**
  * @swagger
- * /reaction:
+ * /reaction/{postId}:
  *   get:
- *     summary: Retrieve all Reactions
+ *     summary: Retrieve all Reactions for a specific Post
  *     tags: [Reaction]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The post ID to get reactions for
+ *       - in: query
+ *         name: cursor
+ *         schema:
+ *           type: string
+ *         description: Cursor for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 10
+ *         description: Number of items per page
  *     responses:
  *       200:
- *         description: List of Reactions retrieved successfully
+ *         description: List of reactions retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -59,17 +89,30 @@ reactionRouter.use(authGuard);
  *                   example: true
  *                 message:
  *                   type: string
- *                   example: reactions retrieved successfully
+ *                   example: Reactions retrieved successfully
  *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Reaction'
+ *                   type: object
+ *                   properties:
+ *                     reactions:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Reaction'
+ *                     pagination:
+ *                       type: object
+ *                       properties:
+ *                         hasNextPage:
+ *                           type: boolean
+ *                         nextCursor:
+ *                           type: string
+ *                           nullable: true
+ *                         count:
+ *                           type: integer
  */
 reactionRouter.get('/:postId', getAllReactionsValidationShcema, reactionController.getReactionsController);
 
 /**
  * @swagger
- * /reaction/{id}:
+ * /reaction/{id}/reaction:
  *   get:
  *     summary: Retrieve a single Reaction by ID
  *     tags: [Reaction]
@@ -95,7 +138,7 @@ reactionRouter.get('/:postId', getAllReactionsValidationShcema, reactionControll
  *                   example: true
  *                 message:
  *                   type: string
- *                   example: reaction retrieved successfully
+ *                   example: Reaction retrieved successfully
  *                 data:
  *                   $ref: '#/components/schemas/Reaction'
  *       404:
@@ -105,25 +148,35 @@ reactionRouter.get('/:id/reaction', reactionController.getReactionByIdController
 
 /**
  * @swagger
- * /reaction:
+ * /reaction/{postId}:
  *   post:
- *     summary: Create a new Reaction
+ *     summary: Create or Toggle a Reaction for a Post
+ *     description: If a reaction of the same type by the same user already exists, it will be removed (toggled off). If a different reaction type exists, it will be updated.
  *     tags: [Reaction]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The post ID to react to
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - reactionType
  *             properties:
- *               # Add properties here
- *               exampleProperty:
+ *               reactionType:
  *                 type: string
+ *                 enum: [LIKE, HELPFUL, EASY, TOUGH, FIRE, MIND_BLOWN]
  *     responses:
  *       201:
- *         description: Reaction created successfully
+ *         description: Reaction processed successfully
  *         content:
  *           application/json:
  *             schema:
@@ -134,9 +187,11 @@ reactionRouter.get('/:id/reaction', reactionController.getReactionByIdController
  *                   example: true
  *                 message:
  *                   type: string
- *                   example: reaction created successfully
+ *                   example: Reaction created successfully
  *                 data:
  *                   $ref: '#/components/schemas/Reaction'
+ *       400:
+ *         description: Validation failed
  */
 reactionRouter.post('/:postId', createReactionValidationSchema, reactionController.createReactionController);
 

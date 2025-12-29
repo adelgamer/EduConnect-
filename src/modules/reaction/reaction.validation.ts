@@ -22,7 +22,7 @@ export const updateReactionValidationSchema = [
 
 export const getAllReactionsValidationShcema = [
     // example:
-    param('id')
+    param('postId')
         .trim()
         .notEmpty().withMessage('Post id is required'),
     // example:
