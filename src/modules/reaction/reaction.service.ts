@@ -21,11 +21,12 @@ export async function getById(id: string) {
 export async function create(actorId: string, postId: string, data: any) {
     let reaction;
     // 1- Checking if post exists and not deleted
-    const post = await prisma.post.findUnique({ where: { id: postId }, include: { reactions: true } });
+    const post = await prisma.post.findUnique({ where: { id: postId } });
     if (!post || (post && post.isDeleted)) throw new NotFoundExcpetion('Post not found');
 
     // 2- Check if reaction from the same actor exists
-    const isSameActorReactionExists = post.reactions.find((reac) => reac.userId === actorId);
+    // const isSameActorReactionExists = post.reactions.find((reac) => reac.userId === actorId);
+    const isSameActorReactionExists = await prisma.reaction.findFirst({ where: { userId: actorId, postId } });
 
     // 3- Reaction from same actor and same reaction remove reaction
     if (isSameActorReactionExists && data.reactionType === isSameActorReactionExists.reactionType) {
