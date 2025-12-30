@@ -20,3 +20,8 @@ export const fetchAllPostCommentsValidationSchema = [
         .optional()
         .isInt().withMessage('Limit must be an integer'),
 ];
+
+export const updateCommentValidationSchema = [
+    body('content')
+        .notEmpty().withMessage("Comment content can't be empty"),
+];

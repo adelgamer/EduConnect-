@@ -67,8 +67,20 @@ export async function create(actorId: string, postId: string, data: any) {
 /**
  * Processes data to update an existing Comment.
  */
-export async function update(id: string, data: any) {
-    return "Comment with ID: \${id\} updated successfully.";
+export async function update(actorId: string, id: string, data: any) {
+    // 1- Checking if comment exists and not deleted
+    const comment = await checkCommentExists(id)
+
+    // 2- Check if post exists
+    const post = await checkPostExists(comment.postId);
+
+    // 3- Check if actor is owner
+    if (actorId !== comment.userId) throw new UnauthorizedExcpetion("Can't delete comment that is not your own");
+
+    // 4- Update the comment
+    const updatedComment = await prisma.comment.update({ where: { id }, data: { content: data.content } });
+
+    return updatedComment;
 }
 
 /**

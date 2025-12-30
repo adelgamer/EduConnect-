@@ -59,7 +59,7 @@ export async function updateCommentController(req: Request, res: Response) {
     if (!id) throw new BadRequestExcpetion('Identification ID is required');
     if (!errors.isEmpty()) throw new BadRequestExcpetion('Validation failed', errors);
 
-    const data = await commentService.update(id, req.body);
+    const data = await commentService.update(req.user!.userId, id, req.body);
     res.json({
         success: true,
         message: "Comment updated successfully",
