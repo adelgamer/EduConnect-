@@ -11,8 +11,29 @@ async function checkCommentExists(id: string) {
 /**
  * Fetches all Comment data.
  */
-export async function getAll() {
-    return "List of all Comments retrieved from the service.";
+export async function getAll(postId: string, limit: number = 10, cursor: string | undefined) {
+    // 1- Check post exists
+    const post = await checkPostExists(postId);
+
+    // 2- Retreive undeleted comment with cursor pagination
+    const query: any = {
+        take: limit + 1,
+        orderBy: { id: 'asc' },
+        where: { postId, isDeleted: false }
+    }
+    if (cursor) query.cursor = { id: cursor };
+
+    const comments = await prisma.comment.findMany(query);
+
+    let hasNextPage: boolean = false;
+    let nextCursor: string | null = null;
+    if (comments.length > limit) {
+        hasNextPage = true;
+        nextCursor = comments[limit].id;
+        comments.pop();
+    }
+
+    return { comments, pagination: { hasNextPage, nextCursor, count: comments.length } };
 }
 
 /**

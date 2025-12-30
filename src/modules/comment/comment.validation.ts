@@ -1,4 +1,4 @@
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 export const createCommentValidationSchema = [
     // example:
@@ -10,10 +10,13 @@ export const createCommentValidationSchema = [
         .notEmpty().withMessage('Comment content is required'),
 ];
 
-export const updateCommentValidationSchema = [
-    // example:
-    // body('title')
-    //     .trim()
-    //     .notEmpty().withMessage('Title is required')
-    //     .isLength({ max: 255 }).withMessage('Title cannot exceed 255 characters'),
+export const fetchAllPostCommentsValidationSchema = [
+    param('postId')
+        .trim()
+        .notEmpty().withMessage('postId is required'),
+    query('cursor')
+        .optional().isString(),
+    query('limit')
+        .optional()
+        .isInt().withMessage('Limit must be an integer'),
 ];

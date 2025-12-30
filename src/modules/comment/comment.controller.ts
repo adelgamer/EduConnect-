@@ -7,7 +7,11 @@ import * as commentService from './comment.service.js';
  * GET /api/comments
  */
 export async function getCommentsController(req: Request, res: Response) {
-    const data = await commentService.getAll();
+
+    const cursor: string | undefined = req.query.cursor as string;
+    const limit: number = req.query.limit ? parseInt(req.query.limit as string) : 10;
+
+    const data = await commentService.getAll(req.params.postId, limit, cursor);
     res.json({
         success: true,
         message: "Comments retrieved successfully",

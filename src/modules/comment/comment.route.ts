@@ -1,7 +1,7 @@
 import express from 'express';
 import { checkSchema } from 'express-validator';
 import * as commentController from './comment.controller.js';
-import { createCommentValidationSchema, updateCommentValidationSchema } from './comment.validation.js';
+import { createCommentValidationSchema, fetchAllPostCommentsValidationSchema } from './comment.validation.js';
 import { authGuard } from '../../middlewares/auth.middleware.js';
 
 /**
@@ -65,7 +65,7 @@ commentRouter.use(authGuard);
  *                   items:
  *                     $ref: '#/components/schemas/Comment'
  */
-commentRouter.get('/', commentController.getCommentsController);
+commentRouter.get('/post/:postId/comments', fetchAllPostCommentsValidationSchema, commentController.getCommentsController);
 
 /**
  * @swagger
@@ -182,7 +182,7 @@ commentRouter.post('/:postId', createCommentValidationSchema, commentController.
  *                 data:
  *                   $ref: '#/components/schemas/Comment'
  */
-commentRouter.put('/:id', updateCommentValidationSchema, commentController.updateCommentController);
+commentRouter.put('/:id', commentController.updateCommentController);
 
 /**
  * @swagger
