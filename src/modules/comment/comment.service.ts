@@ -1,5 +1,6 @@
 import prisma from "../../../core/databaseClient/prismaClient/prismaClient.js";
 import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
+import { UnauthorizedExcpetion } from "../../../core/errors/UnauthorizedExcpetion copy.js";
 import { checkPostExists } from "../post/post.service.js";
 
 async function checkCommentExists(id: string) {
@@ -73,6 +74,19 @@ export async function update(id: string, data: any) {
 /**
  * Performs the deletion of a Comment record.
  */
-export async function remove(id: string) {
-    return "Comment with ID: \${id\} deleted successfully.";
+export async function remove(actorId: string, id: string) {
+    // 1- Check if comment exsits
+    const comment = await checkCommentExists(id);
+
+    // 2- Check of post exists
+    const post = await checkPostExists(comment.postId);
+
+    // 3- Check if actor is owner
+    if (actorId !== comment.userId) throw new UnauthorizedExcpetion("Can't delete comment that is not your own");
+
+    // 4- Delete comment
+    await prisma.comment.update({ where: { id }, data: { isDeleted: true } })
+    comment.isDeleted = true;
+
+    return comment;
 }

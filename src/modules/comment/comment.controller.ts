@@ -74,7 +74,7 @@ export async function deleteCommentController(req: Request, res: Response) {
     const id = req.params.id;
     if (!id) throw new BadRequestExcpetion('Identification ID is required');
 
-    const data = await commentService.remove(id);
+    const data = await commentService.remove(req.user!.userId, id);
     res.json({
         success: true,
         message: "Comment deleted successfully",
