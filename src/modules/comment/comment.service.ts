@@ -1,5 +1,12 @@
 import prisma from "../../../core/databaseClient/prismaClient/prismaClient.js";
+import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
 import { checkPostExists } from "../post/post.service.js";
+
+async function checkCommentExists(id: string) {
+    const comment = await prisma.comment.findUnique({ where: { id } });
+    if (!comment || comment.isDeleted) throw new NotFoundExcpetion('Comment not found');
+    return comment;
+}
 
 /**
  * Fetches all Comment data.
@@ -12,7 +19,14 @@ export async function getAll() {
  * Fetches a single Comment by ID.
  */
 export async function getById(id: string) {
-    return `Comment with ID: \${id\} retrieved from the service.`;
+    // 1- Checking if comment exists and not deleted
+    const comment = await checkCommentExists(id)
+
+    // 2- Check if post exists
+    const post = await checkPostExists(comment.postId);
+
+    // 3- Fetch one comment
+    return comment;
 }
 
 /**
