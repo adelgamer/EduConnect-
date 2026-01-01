@@ -73,6 +73,8 @@ export async function create(actorId: string, entityId: string, data: any, entit
         reaction = null;
     }
 
+    // TODO decrease a reaction from the entity
+
     // 4- Reaction from same actor and differnt reaction update reaction
     else if (isSameActorReactionExists && data.reactionType !== isSameActorReactionExists.reactionType) {
         reaction = await prisma.reaction.update({
@@ -88,6 +90,8 @@ export async function create(actorId: string, entityId: string, data: any, entit
     if (entityType === EntityType.POST) dataToInsert.postId = entityId
     else if (entityType === EntityType.COMMENT) dataToInsert.commentId = entityId;
     if (!isSameActorReactionExists) reaction = await prisma.reaction.create({ data: dataToInsert })
+
+    // TODO increase a reaction in the entity
 
     // 6- Return reaction
     return reaction;

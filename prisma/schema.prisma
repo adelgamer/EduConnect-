@@ -111,14 +111,16 @@ model Reaction {
 }
 
 model Comment {
-  id        String  @id @default(uuid())
-  postId    String
-  post      Post    @relation(fields: [postId], references: [id])
-  userId    String
-  user      User    @relation(fields: [userId], references: [id])
-  content   String  @db.Text
-  isDeleted Boolean @default(false)
+  id            String @id @default(uuid())
+  postId        String
+  post          Post   @relation(fields: [postId], references: [id])
+  userId        String
+  user          User   @relation(fields: [userId], references: [id])
+  content       String @db.Text
+  reactionCount Int    @default(0)
+  repliesCount  Int    @default(0)
 
+  isDeleted Boolean    @default(false)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt()
   reactions Reaction[]

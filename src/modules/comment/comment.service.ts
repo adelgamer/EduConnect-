@@ -61,6 +61,8 @@ export async function create(actorId: string, postId: string, data: any) {
     // 2- Create comment
     const comment = await prisma.comment.create({ data: { userId: actorId, postId, content: data.content } })
 
+    // TODO increase count in the entity
+
     return comment;
 }
 
@@ -99,6 +101,8 @@ export async function remove(actorId: string, id: string) {
     // 4- Delete comment
     await prisma.comment.update({ where: { id }, data: { isDeleted: true } })
     comment.isDeleted = true;
+
+    // TODO decrease count in the entity
 
     return comment;
 }
