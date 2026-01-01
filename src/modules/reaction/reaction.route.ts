@@ -193,6 +193,6 @@ reactionRouter.get('/:id/reaction', reactionController.getReactionByIdController
  *       400:
  *         description: Validation failed
  */
-reactionRouter.post('/:postId', createReactionValidationSchema, reactionController.createReactionController);
+reactionRouter.post('/:postId/:entityType', createReactionValidationSchema, reactionController.createReactionController);
 
-export default reactionRouter;
+export default reactionRouter; 

@@ -1,6 +1,12 @@
 import prisma from "../../../core/databaseClient/prismaClient/prismaClient.js";
 import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
+import { checkCommentExists } from "../comment/comment.service.js";
 import { checkPostExists } from "../post/post.service.js";
+
+export enum EntityType {
+    POST = 'POST',
+    COMMENT = 'COMMENT'
+}
 
 /**
  * Fetches all Reaction data.
@@ -41,13 +47,18 @@ export async function getById(id: string) {
 /**
  * Processes data to create a new Reaction.
  */
-export async function create(actorId: string, postId: string, data: any) {
+export async function create(actorId: string, entityId: string, data: any, entityType: EntityType) {
     let reaction;
     // 1- Checking if post exists and not deleted
-    const post = await checkPostExists(postId)
+    let entity: any;
+    if (entityType === EntityType.POST) entity = await checkPostExists(entityId)
+    else if (entityType === EntityType.COMMENT) entity = await checkCommentExists(entityId)
 
     // 2- Check if reaction from the same actor exists
-    const isSameActorReactionExists = await prisma.reaction.findFirst({ where: { userId: actorId, postId } });
+    const whereCondition: any = { userId: actorId }
+    if (entityType === EntityType.POST) whereCondition.postId = entityId
+    else if (entityType === EntityType.COMMENT) whereCondition.commentId = entityId;
+    const isSameActorReactionExists = await prisma.reaction.findFirst({ where: whereCondition });
 
     // 3- Reaction from same actor and same reaction remove reaction
     if (isSameActorReactionExists && data.reactionType === isSameActorReactionExists.reactionType) {
@@ -65,13 +76,13 @@ export async function create(actorId: string, postId: string, data: any) {
     };
 
     // 5- If no reaction exists just create a new one
-    if (!isSameActorReactionExists) reaction = await prisma.reaction.create({
-        data: {
-            userId: actorId,
-            postId,
-            reactionType: data.reactionType
-        }
-    })
+    const dataToInsert: any = {
+        userId: actorId,
+        reactionType: data.reactionType
+    }
+    if (entityType === EntityType.POST) dataToInsert.postId = entityId
+    else if (entityType === EntityType.COMMENT) dataToInsert.commentId = entityId;
+    if (!isSameActorReactionExists) reaction = await prisma.reaction.create({ data: dataToInsert })
 
     // 6- Return reaction
     return reaction;

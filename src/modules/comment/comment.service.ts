@@ -3,7 +3,7 @@ import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
 import { UnauthorizedExcpetion } from "../../../core/errors/UnauthorizedExcpetion copy.js";
 import { checkPostExists } from "../post/post.service.js";
 
-async function checkCommentExists(id: string) {
+export async function checkCommentExists(id: string) {
     const comment = await prisma.comment.findUnique({ where: { id } });
     if (!comment || comment.isDeleted) throw new NotFoundExcpetion('Comment not found');
     return comment;

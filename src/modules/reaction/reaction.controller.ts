@@ -39,7 +39,7 @@ export async function createReactionController(req: Request, res: Response) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) throw new BadRequestExcpetion('Validation failed', errors);
 
-    const data = await reactionService.create(req.user!.userId, req.params.postId, req.body);
+    const data = await reactionService.create(req.user!.userId, req.params.postId, req.body, req.params.entityType as reactionService.EntityType);
     res.status(201).json({
         success: true,
         message: `Reaction ${data ? 'created' : 'removed'} successfully`,

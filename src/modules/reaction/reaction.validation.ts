@@ -1,5 +1,6 @@
 import { body, param, query } from 'express-validator';
 import { ReactionType } from '../../../generated/prisma/enums.js';
+import { EntityType } from './reaction.service.js';
 
 export const createReactionValidationSchema = [
     body('reactionType')
@@ -10,6 +11,11 @@ export const createReactionValidationSchema = [
     param('postId')
         .trim()
         .notEmpty().withMessage('postId is required'),
+
+    param('entityType')
+        .trim()
+        .isIn(Object.values(EntityType))
+        .notEmpty().withMessage('entityType is required'),
 ];
 
 export const updateReactionValidationSchema = [

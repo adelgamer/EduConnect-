@@ -103,6 +103,9 @@ model Reaction {
   postId String?
   post   Post?   @relation(fields: [postId], references: [id])
 
+  commentId String?
+  comment   Comment? @relation(fields: [commentId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
 }
@@ -116,6 +119,7 @@ model Comment {
   content   String  @db.Text
   isDeleted Boolean @default(false)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt()
+  reactions Reaction[]
 }
