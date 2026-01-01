@@ -9,7 +9,7 @@ import * as reactionService from './reaction.service.js';
 export async function getReactionsController(req: Request, res: Response) {
     const cursor: string | undefined = req.query.cursor as string;
     const limit: number = req.query.limit ? parseInt(req.query.limit as string) : 10;
-    const data = await reactionService.getAll(req.params.postId, cursor, limit);
+    const data = await reactionService.getAll(req.params.entityId, req.params.entityType as reactionService.EntityType, cursor, limit);
     res.json({
         success: true,
         message: "Reactions retrieved successfully",
@@ -39,7 +39,7 @@ export async function createReactionController(req: Request, res: Response) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) throw new BadRequestExcpetion('Validation failed', errors);
 
-    const data = await reactionService.create(req.user!.userId, req.params.postId, req.body, req.params.entityType as reactionService.EntityType);
+    const data = await reactionService.create(req.user!.userId, req.params.entityId, req.body, req.params.entityType as reactionService.EntityType);
     res.status(201).json({
         success: true,
         message: `Reaction ${data ? 'created' : 'removed'} successfully`,

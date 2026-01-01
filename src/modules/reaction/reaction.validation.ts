@@ -8,9 +8,9 @@ export const createReactionValidationSchema = [
         .notEmpty().withMessage('reactionType is required')
         .isIn(Object.values(ReactionType)),
 
-    param('postId')
+    param('entityId')
         .trim()
-        .notEmpty().withMessage('postId is required'),
+        .notEmpty().withMessage('entityId is required'),
 
     param('entityType')
         .trim()
@@ -28,9 +28,14 @@ export const updateReactionValidationSchema = [
 
 export const getAllReactionsValidationShcema = [
     // example:
-    param('postId')
+    param('entityId')
         .trim()
-        .notEmpty().withMessage('Post id is required'),
+        .notEmpty().withMessage('entityId is required'),
+
+    param('entityType')
+        .trim()
+        .isIn(Object.values(EntityType))
+        .notEmpty().withMessage('entityType is required'),
     // example:
     query('cursor')
         .optional().isString(),

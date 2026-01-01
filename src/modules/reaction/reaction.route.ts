@@ -50,19 +50,26 @@ reactionRouter.use(authGuard);
 
 /**
  * @swagger
- * /reaction/{postId}:
+ * /reaction/{entityId}/{entityType}:
  *   get:
- *     summary: Retrieve all Reactions for a specific Post
+ *     summary: Retrieve all Reactions for a specific Post or Comment
  *     tags: [Reaction]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: postId
+ *         name: entityId
  *         required: true
  *         schema:
  *           type: string
- *         description: The post ID to get reactions for
+ *         description: The ID of the post or comment
+ *       - in: path
+ *         name: entityType
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [POST, COMMENT]
+ *         description: The type of entity
  *       - in: query
  *         name: cursor
  *         schema:
@@ -108,7 +115,7 @@ reactionRouter.use(authGuard);
  *                         count:
  *                           type: integer
  */
-reactionRouter.get('/:postId', getAllReactionsValidationShcema, reactionController.getReactionsController);
+reactionRouter.get('/:entityId/:entityType', getAllReactionsValidationShcema, reactionController.getReactionsController);
 
 /**
  * @swagger
@@ -148,20 +155,27 @@ reactionRouter.get('/:id/reaction', reactionController.getReactionByIdController
 
 /**
  * @swagger
- * /reaction/{postId}:
+ * /reaction/{entityId}/{entityType}:
  *   post:
- *     summary: Create or Toggle a Reaction for a Post
+ *     summary: Create or Toggle a Reaction for a Post or Comment
  *     description: If a reaction of the same type by the same user already exists, it will be removed (toggled off). If a different reaction type exists, it will be updated.
  *     tags: [Reaction]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: postId
+ *         name: entityId
  *         required: true
  *         schema:
  *           type: string
- *         description: The post ID to react to
+ *         description: The ID of the post or comment to react to
+ *       - in: path
+ *         name: entityType
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [POST, COMMENT]
+ *         description: The type of entity being reacted to
  *     requestBody:
  *       required: true
  *       content:
@@ -193,6 +207,6 @@ reactionRouter.get('/:id/reaction', reactionController.getReactionByIdController
  *       400:
  *         description: Validation failed
  */
-reactionRouter.post('/:postId/:entityType', createReactionValidationSchema, reactionController.createReactionController);
+reactionRouter.post('/:entityId/:entityType', createReactionValidationSchema, reactionController.createReactionController);
 
 export default reactionRouter; 

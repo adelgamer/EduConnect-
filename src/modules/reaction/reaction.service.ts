@@ -11,16 +11,21 @@ export enum EntityType {
 /**
  * Fetches all Reaction data.
  */
-export async function getAll(postId: string, cursor: string | null, limit: number = 10) {
-    // 1- Checking if post exists and not deleted
-    const post = await checkPostExists(postId)
+export async function getAll(entityId: string, entityType: EntityType, cursor: string | null, limit: number = 10) {
+    // 1- Checking if entity exists
+    let entity: any;
+    if (entityType === EntityType.POST) entity = await checkPostExists(entityId)
+    else if (entityType === EntityType.COMMENT) entity = await checkCommentExists(entityId)
 
     // 2- Reteive reactions
     const query: any = {
         take: limit + 1,
         orderBy: { id: 'asc' },
-        where: { postId }
+        where: {}
     }
+    if (entityType === EntityType.POST) query.where.postId = entityId
+    else if (entityType === EntityType.COMMENT) query.where.commentId = entityId;
+
     if (cursor) query.cursor = { id: cursor };
     const reactions = await prisma.reaction.findMany(query);
 
