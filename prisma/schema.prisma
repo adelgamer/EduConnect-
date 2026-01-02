@@ -7,15 +7,6 @@ datasource db {
   provider = "mysql"
 }
 
-// | Field          | Description             |
-// | -------------- | ----------------------- |
-// | profile_photo  | Profile image path      |
-// | field_of_study | Faculty / field         |
-// | degree_system  | LMD / Engineering       |
-// | academic_year  | L1, L2, L3, M1, M2, PhD |
-// | created_at     | Account creation date   |
-// | updated_at     | Last update             |
-
 model User {
   id           String  @id @default(uuid())
   firstName    String  @db.VarChar(25)
@@ -26,6 +17,9 @@ model User {
   bio          String? @db.VarChar(200)
 
   profilePhoto String? @db.VarChar(2048)
+
+  specialityId String?
+  speciality   Specialty? @relation(fields: [specialityId], references: [id])
 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt()
@@ -160,7 +154,7 @@ model Faculty {
 
 model Specialty {
   id          String  @id @default(uuid())
-  name        String  @db.VarChar(100)  
+  name        String  @db.VarChar(100)
   shortName   String? @db.VarChar(12)
   description String? @db.VarChar(500)
 
@@ -170,6 +164,7 @@ model Specialty {
   isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
+  users     User[]
 
   @@unique([name, facultyId])
 }
