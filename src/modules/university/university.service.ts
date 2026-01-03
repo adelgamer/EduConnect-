@@ -1,3 +1,5 @@
+import prisma from "../../../core/databaseClient/prismaClient/prismaClient.js";
+import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
 
 /**
  * Fetches all University data.
@@ -10,7 +12,12 @@ export async function getAll() {
  * Fetches a single University by ID.
  */
 export async function getById(id: string) {
-    return `University with ID: \${id\} retrieved from the service.`;
+    // 1- Checking if usiversity exists
+    const university = await prisma.university.findUnique({ where: { id } })
+    if (!university) throw new NotFoundExcpetion('University does not exists');
+
+    // 2- Return it with related faculties and specialties
+    return university;
 }
 
 /**
@@ -24,12 +31,12 @@ export async function create(data: any) {
  * Processes data to update an existing University.
  */
 export async function update(id: string, data: any) {
-    return "University with ID: \${id\} updated successfully.";
+    return `University with ID: ${id} updated successfully.`;
 }
 
 /**
  * Performs the deletion of a University record.
  */
 export async function remove(id: string) {
-    return "University with ID: \${id\} deleted successfully.";
+    return `University with ID: ${id} deleted successfully.`;
 }
