@@ -122,16 +122,18 @@ model Comment {
 
 model University {
   id          String  @id @default(uuid())
-  name        String  @unique @db.VarChar(100)
-  shortName   String? @unique @db.VarChar(12)
+  name        String  @db.VarChar(100)
+  shortName   String? @db.VarChar(12)
   description String? @db.VarChar(500)
   location    String  @db.VarChar(100)
   website     String? @db.VarChar(2048)
 
-  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt()
   faculties Faculty[]
+
+  @@unique([name, shortName, deletedAt])
 }
 
 model Faculty {
@@ -144,12 +146,12 @@ model Faculty {
   universityId String
   university   University @relation(fields: [universityId], references: [id])
 
-  isDeleted   Boolean     @default(false)
+  deletedAt   DateTime?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt()
   specialties Specialty[]
 
-  @@unique([name, universityId])
+  @@unique([name, universityId, deletedAt])
 }
 
 model Specialty {
@@ -161,10 +163,10 @@ model Specialty {
   facultyId String
   faculty   Faculty @relation(fields: [facultyId], references: [id])
 
-  isDeleted Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt()
   users     User[]
 
-  @@unique([name, facultyId])
+  @@unique([name, facultyId, deletedAt])
 }

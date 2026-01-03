@@ -12,9 +12,10 @@ jest.unstable_mockModule("../../../../core/databaseClient/prismaClient/prismaCli
 });
 
 // 2. Dynamically import the service and singleton AFTER the mock is registered
-const { getAll, getById, create, update, remove } = await import("../university.service.js");
+const { checkIfUniversityExists, getAll, getById, create, update, remove } = await import("../university.service.js");
 const { prismaMock } = await import("../../../../singleton.js");
 import { NotFoundExcpetion } from "../../../../core/errors/NotFoundExcpetion.js";
+import { ConflictException } from "../../../../core/errors/ConflictException.js";
 
 describe('University service', () => {
   const mockUniversity = {
@@ -24,10 +25,33 @@ describe('University service', () => {
     description: 'The oldest university in Algeria, founded in 1909.',
     location: '2 Rue Didouche Mourad, Alger Centre 16000',
     website: 'https://www.univ-alger.dz',
-    isDeleted: false,
+    deletedAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
+
+  describe('checkIfUniversityExists', () => {
+    it('should return university if it exists and is not deleted', async () => {
+      prismaMock.university.findUnique.mockResolvedValue(mockUniversity as any);
+
+      const result = await checkIfUniversityExists('adc');
+
+      expect(result).toEqual(mockUniversity);
+    });
+
+    it('should throw NotFoundException if university does not exist', async () => {
+      prismaMock.university.findUnique.mockResolvedValue(null);
+
+      await expect(checkIfUniversityExists('non-existent')).rejects.toThrow(NotFoundExcpetion);
+    });
+
+    it('should throw NotFoundException if university is soft-deleted', async () => {
+      const deletedUniversity = { ...mockUniversity, deletedAt: new Date() };
+      prismaMock.university.findUnique.mockResolvedValue(deletedUniversity as any);
+
+      await expect(checkIfUniversityExists('deleted-id')).rejects.toThrow(NotFoundExcpetion);
+    });
+  });
 
   describe('getAll', () => {
     it('should return all universities', async () => {
@@ -48,7 +72,7 @@ describe('University service', () => {
 
       expect(result).toEqual(mockUniversity);
       expect(prismaMock.university.findUnique).toHaveBeenCalledWith({
-        where: { id: 'adc' }
+        where: { id: 'adc', deletedAt: null }
       });
     });
 
@@ -60,12 +84,15 @@ describe('University service', () => {
   });
 
   describe('create', () => {
-    it('should create a new university', async () => {
-      const universityData = {
-        name: 'New University',
-        shortName: 'NU',
-        location: 'Location'
-      };
+    const universityData = {
+      name: 'New University',
+      shortName: 'NU',
+      location: 'Location'
+    };
+
+    it('should create a new university if it does not already exist', async () => {
+      // Mock findMany to return empty array (not exist)
+      prismaMock.university.findMany.mockResolvedValue([] as any);
       prismaMock.university.create.mockResolvedValue({ ...mockUniversity, ...universityData } as any);
 
       const result = await create(universityData);
@@ -74,6 +101,14 @@ describe('University service', () => {
       expect(prismaMock.university.create).toHaveBeenCalledWith({
         data: universityData
       });
+    });
+
+    it('should throw ConflictException if university already exists', async () => {
+      // Mock findMany to return an existing university
+      prismaMock.university.findMany.mockResolvedValue([mockUniversity] as any);
+
+      await expect(create(universityData)).rejects.toThrow(ConflictException);
+      expect(prismaMock.university.create).not.toHaveBeenCalled();
     });
   });
 
@@ -93,23 +128,24 @@ describe('University service', () => {
   });
 
   describe('remove', () => {
-    it('should delete a university when it exists', async () => {
+    it('should soft delete a university when it exists', async () => {
       prismaMock.university.findUnique.mockResolvedValue(mockUniversity as any);
-      prismaMock.university.delete.mockResolvedValue(mockUniversity as any);
+      prismaMock.university.update.mockResolvedValue({ ...mockUniversity, deletedAt: new Date() } as any);
 
       const result = await remove('adc');
 
-      expect(result).toEqual(mockUniversity);
-      expect(prismaMock.university.delete).toHaveBeenCalledWith({
-        where: { id: 'adc' }
+      expect(result.deletedAt).toBeDefined();
+      expect(prismaMock.university.update).toHaveBeenCalledWith({
+        where: { id: 'adc' },
+        data: { deletedAt: expect.any(Date) }
       });
     });
 
-    it('should throw NotFoundException when deleting a non-existent university', async () => {
+    it('should throw NotFoundException when soft deleting a non-existent university', async () => {
       prismaMock.university.findUnique.mockResolvedValue(null);
 
       await expect(remove('non-existent')).rejects.toThrow(NotFoundExcpetion);
-      expect(prismaMock.university.delete).not.toHaveBeenCalled();
+      expect(prismaMock.university.update).not.toHaveBeenCalled();
     });
   });
 });

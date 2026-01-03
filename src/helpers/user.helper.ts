@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { UnauthorizedExcpetion } from "../../core/errors/UnauthorizedExcpetion copy.js";
+import { UnauthorizedExcpetion } from "../../core/errors/UnauthorizedExcpetion.js";
 import type { User } from "../../generated/prisma/client.js"
 
 export function sanitizeUser(user: User) {

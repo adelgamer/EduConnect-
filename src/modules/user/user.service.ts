@@ -1,7 +1,7 @@
 import prisma from "../../../core/databaseClient/prismaClient/prismaClient.js";
 import { ConflictException } from "../../../core/errors/ConflictException.js";
 import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
-import { UnauthorizedExcpetion } from "../../../core/errors/UnauthorizedExcpetion copy.js";
+import { UnauthorizedExcpetion } from "../../../core/errors/UnauthorizedExcpetion.js";
 import bycrypt from 'bcrypt'
 import { sanitizeUser } from "../../helpers/user.helper.js";
 import { BadRequestExcpetion } from "../../../core/errors/BadRequestException.js";

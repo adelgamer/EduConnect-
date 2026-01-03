@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { UnauthorizedExcpetion } from '../../core/errors/UnauthorizedExcpetion copy.js';
+import { UnauthorizedExcpetion } from '../../core/errors/UnauthorizedExcpetion.js';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
 

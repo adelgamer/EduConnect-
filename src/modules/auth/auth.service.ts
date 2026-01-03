@@ -5,7 +5,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { sanitizeUser } from "../../helpers/user.helper.js";
 import { InternalServerError } from "../../../core/errors/InternalServerError.js";
 import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
-import { UnauthorizedExcpetion } from "../../../core/errors/UnauthorizedExcpetion copy.js";
+import { UnauthorizedExcpetion } from "../../../core/errors/UnauthorizedExcpetion.js";
 import { Request } from "express";
 
 /**

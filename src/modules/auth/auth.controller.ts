@@ -3,7 +3,7 @@ import { validationResult } from 'express-validator';
 import { BadRequestExcpetion } from '../../../core/errors/BadRequestException.js';
 import * as authService from './auth.service.js';
 import { DefaultDeserializer } from 'node:v8';
-import { UnauthorizedExcpetion } from '../../../core/errors/UnauthorizedExcpetion copy.js';
+import { UnauthorizedExcpetion } from '../../../core/errors/UnauthorizedExcpetion.js';
 
 /**
  * POST /api/auths
