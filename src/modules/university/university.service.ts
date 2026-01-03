@@ -1,11 +1,17 @@
 import prisma from "../../../core/databaseClient/prismaClient/prismaClient.js";
 import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
 
+async function checkIfUniversityExists(id: string) {
+    const university = await prisma.university.findUnique({ where: { id } })
+    if (!university) throw new NotFoundExcpetion('University does not exists');
+}
+
 /**
  * Fetches all University data.
  */
 export async function getAll() {
-    return "List of all Universitys retrieved from the service.";
+    const universities = await prisma.university.findMany();
+    return universities;
 }
 
 /**
@@ -24,19 +30,26 @@ export async function getById(id: string) {
  * Processes data to create a new University.
  */
 export async function create(data: any) {
-    return "University data processed and created successfully.";
+    const createdUniversity = await prisma.university.create({ data });
+    return createdUniversity;
 }
 
 /**
  * Processes data to update an existing University.
  */
 export async function update(id: string, data: any) {
-    return `University with ID: ${id} updated successfully.`;
+    const updatedUniversity = await prisma.university.update({ where: { id }, data });
+    return updatedUniversity;
 }
 
 /**
  * Performs the deletion of a University record.
  */
 export async function remove(id: string) {
-    return `University with ID: ${id} deleted successfully.`;
+    // 1- Checking if usiversity exists
+    await checkIfUniversityExists(id)
+
+    // 2- Delete it
+    const deletedUniversity = await prisma.university.delete({ where: { id } });
+    return deletedUniversity;
 }
