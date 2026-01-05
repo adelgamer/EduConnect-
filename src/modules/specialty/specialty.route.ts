@@ -25,7 +25,24 @@ const specialtyRouter = express.Router();
  *       properties:
  *         id:
  *           type: string
+ *           format: uuid
  *           description: The specialty ID
+ *         name:
+ *           type: string
+ *           description: Full name of the specialty
+ *           example: Computer Science
+ *         shortName:
+ *           type: string
+ *           description: Short name or abbreviation
+ *           example: CS
+ *         description:
+ *           type: string
+ *           description: Brief description of the specialty
+ *           example: Study of computation, automation, and information.
+ *         facultyId:
+ *           type: string
+ *           format: uuid
+ *           description: ID of the faculty this specialty belongs to
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -40,13 +57,13 @@ const specialtyRouter = express.Router();
  * @swagger
  * /specialty:
  *   get:
- *     summary: Retrieve all Specialtys
+ *     summary: Retrieve all Specialties
  *     tags: [Specialty]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: List of Specialtys retrieved successfully
+ *         description: List of Specialties retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -79,6 +96,7 @@ specialtyRouter.get('/', specialtyController.getSpecialtysController);
  *         required: true
  *         schema:
  *           type: string
+ *           format: uuid
  *         description: The specialty ID
  *     responses:
  *       200:
@@ -115,10 +133,23 @@ specialtyRouter.get('/:id', specialtyController.getSpecialtyByIdController);
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - name
+ *               - facultyId
  *             properties:
- *               # Add properties here
- *               exampleProperty:
+ *               name:
  *                 type: string
+ *                 example: Artificial Intelligence
+ *               shortName:
+ *                 type: string
+ *                 example: AI
+ *               description:
+ *                 type: string
+ *                 example: Advanced study of intelligent agents.
+ *               facultyId:
+ *                 type: string
+ *                 format: uuid
+ *                 example: 123e4567-e89b-12d3-a456-426614174000
  *     responses:
  *       201:
  *         description: Specialty created successfully
@@ -152,6 +183,7 @@ specialtyRouter.post('/', createSpecialtyValidationSchema, specialtyController.c
  *         required: true
  *         schema:
  *           type: string
+ *           format: uuid
  *         description: The specialty ID to update
  *     requestBody:
  *       required: true
@@ -160,9 +192,18 @@ specialtyRouter.post('/', createSpecialtyValidationSchema, specialtyController.c
  *           schema:
  *             type: object
  *             properties:
- *               # Add properties here
- *               exampleProperty:
+ *               name:
  *                 type: string
+ *                 example: Computer Engineering
+ *               shortName:
+ *                 type: string
+ *                 example: CE
+ *               description:
+ *                 type: string
+ *                 example: Integration of electronic engineering and computer science.
+ *               facultyId:
+ *                 type: string
+ *                 format: uuid
  *     responses:
  *       200:
  *         description: Specialty updated successfully
@@ -196,6 +237,7 @@ specialtyRouter.put('/:id', updateSpecialtyValidationSchema, specialtyController
  *         required: true
  *         schema:
  *           type: string
+ *           format: uuid
  *         description: The specialty ID to delete
  *     responses:
  *       200:

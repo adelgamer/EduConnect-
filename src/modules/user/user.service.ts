@@ -113,3 +113,24 @@ export async function updatePassword(actorId: string, data: any) {
 
     return sanitizeUser(user);
 }
+
+/**
+ * Processes data to update an existing user.
+ */
+export async function updateUserAcdemicYear(actorId: string, data: any) {
+    // 1- Check if user exists
+    const user = await prisma.user.findUnique({ where: { id: actorId } });
+    if (!user) throw new NotFoundExcpetion('User not found');
+
+    // 2- Update academic year
+    const userToReturn = await prisma.user.update({
+        where: {
+            id: actorId
+        },
+        data: {
+            academicYear: data.academicYear
+        }
+    })
+
+    return sanitizeUser(userToReturn);
+}

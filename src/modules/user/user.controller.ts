@@ -67,3 +67,19 @@ export async function updateUserPasswordController(req: Request, res: Response) 
         data
     });
 }
+
+/**
+ * PUT /api/users/:id
+ */
+export async function updateUserAcdemicYearController(req: Request, res: Response) {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) throw new BadRequestExcpetion('Validation failed', errors);
+
+    const data = await userService.updateUserAcdemicYear(req.user!.userId, req.body);
+    res.json({
+        success: true,
+        message: "user academic year updated successfully",
+        data
+    });
+}

@@ -1,4 +1,5 @@
 import { body, query } from 'express-validator';
+import { AcedemicYears } from '../../../generated/prisma/enums.js';
 
 export const updateUserValidationSchema = [
     // firstName: Required, max 25 chars (matches @db.VarChar(25))
@@ -37,6 +38,10 @@ export const updateUserValidationSchema = [
     body('bio')
         .optional({ checkFalsy: true })
         .isLength({ max: 200 }).withMessage('Bio cannot exceed 200 characters'),
+
+    body('academicYear')
+        .optional({ checkFalsy: true })
+        .isIn(Object.values(AcedemicYears)),
 ];
 
 
@@ -65,3 +70,8 @@ export const updateUserPasswordValidationSchema = [
         .notEmpty().withMessage('Password is required')
         .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
 ];
+
+export const updateUserAcdemicYear = [
+    body('academicYear')
+        .isIn(Object.values(AcedemicYears)),
+]

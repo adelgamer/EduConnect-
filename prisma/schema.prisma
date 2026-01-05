@@ -7,14 +7,28 @@ datasource db {
   provider = "mysql"
 }
 
+enum AcedemicYears {
+  L1
+  L2
+  L3
+  M1
+  M2
+  D1
+  D2
+  D3
+  D4
+  D5
+}
+
 model User {
-  id           String  @id @default(uuid())
-  firstName    String  @db.VarChar(25)
-  lastName     String  @db.VarChar(25)
-  username     String  @unique @db.VarChar(25)
-  email        String  @unique @db.VarChar(254)
-  passwordHash String  @db.Text
-  bio          String? @db.VarChar(200)
+  id           String         @id @default(uuid())
+  firstName    String         @db.VarChar(25)
+  lastName     String         @db.VarChar(25)
+  username     String         @unique @db.VarChar(25)
+  email        String         @unique @db.VarChar(254)
+  passwordHash String         @db.Text
+  bio          String?        @db.VarChar(200)
+  academicYear AcedemicYears?
 
   profilePhoto String? @db.VarChar(2048)
 
