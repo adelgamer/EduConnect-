@@ -8,6 +8,7 @@ import { Options } from 'swagger-jsdoc';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { limiter } from './core/middlewares/rateLimiter.js';
+import { checkCache } from './core/middlewares/cacheMiddleware.js';
 
 const app = express();
 const port = 3001;
@@ -16,7 +17,8 @@ const port = 3001;
 app.use(express.json());
 app.use(cookieParser());
 app.use(baseMiddleware);
-app.use(limiter(1, 60));
+// app.use(limiter(1, 60));
+app.use(checkCache);
 
 // Routes
 app.use(mainRouter);

@@ -6,7 +6,7 @@ import { sanitizeUser } from "../../helpers/user.helper.js";
 import { InternalServerError } from "../../../core/errors/InternalServerError.js";
 import { NotFoundExcpetion } from "../../../core/errors/NotFoundExcpetion.js";
 import { UnauthorizedExcpetion } from "../../../core/errors/UnauthorizedExcpetion.js";
-import { Request } from "express";
+import crypto from 'crypto';
 
 /**
  * Processes data to create a new auth.
@@ -41,8 +41,8 @@ export async function signup(data: any) {
 
     // 5- Generate access and refresh token
     try {
-        const accessToken = await jwt.sign({ userId: userToReturn.id }, process.env.ACCESS_TOKEN_SECRET_KEY || 'secret_key', { expiresIn: '15m' });
-        const refreshToken = await jwt.sign({ userId: userToReturn.id }, process.env.REFRESH_TOKEN_SECRET_KEY || 'refresh_secret_key', { expiresIn: '7d' });
+        const accessToken = await jwt.sign({ userId: userToReturn.id, jti: crypto.randomUUID() }, process.env.ACCESS_TOKEN_SECRET_KEY || 'secret_key', { expiresIn: '15m' });
+        const refreshToken = await jwt.sign({ userId: userToReturn.id, jti: crypto.randomUUID() }, process.env.REFRESH_TOKEN_SECRET_KEY || 'refresh_secret_key', { expiresIn: '7d' });
 
         // Store refresh token in the database
         await prisma.refreshToken.create({
@@ -80,8 +80,8 @@ export async function login(data: any) {
 
     // 3- Generate access and refresh token
     try {
-        const accessToken = await jwt.sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET_KEY || 'secret_key', { expiresIn: "15m" });
-        const refreshToken = await jwt.sign({ userId: user.id }, process.env.REFRESH_TOKEN_SECRET_KEY || 'refresh_secret_key', { expiresIn: '7d' });
+        const accessToken = await jwt.sign({ userId: user.id, jti: crypto.randomUUID() }, process.env.ACCESS_TOKEN_SECRET_KEY || 'secret_key', { expiresIn: "15m" });
+        const refreshToken = await jwt.sign({ userId: user.id, jti: crypto.randomUUID() }, process.env.REFRESH_TOKEN_SECRET_KEY || 'refresh_secret_key', { expiresIn: '7d' });
 
         // Store refresh token in the database
         await prisma.refreshToken.create({
