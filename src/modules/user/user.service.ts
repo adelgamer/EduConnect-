@@ -8,6 +8,18 @@ import { BadRequestExcpetion } from "../../../core/errors/BadRequestException.js
 import { User } from "../../../generated/prisma/client.js";
 import { redisClient } from "../../../core/redis/redis.client.js";
 
+export const userFields = {
+    id: true,
+    firstName: true,
+    lastName: true,
+    username: true,
+    email: true,
+    createdAt: true,
+    updatedAt: true,
+    profilePhoto: true,
+    academicYear: true
+}
+
 /**
  * Fetches all user data.
  */
@@ -55,7 +67,9 @@ export async function getById(id: string) {
     if (response) return { cache: true, data: JSON.parse(response) }
 
     // 1- Getting user and checking if exists
-    const user = await prisma.user.findUnique({ where: { id } });
+    const user = await prisma.user.findUnique({
+        where: { id }, select: userFields
+    });
     if (!user) throw new NotFoundExcpetion('User not found');
 
     // Setting cache
@@ -73,7 +87,7 @@ export async function update(actorId: string, id: string, data: any, profileImag
     if (actorId !== id) throw new UnauthorizedExcpetion('Can\'t update another user');
 
     // 2- Check if the updated user exists
-    const user = await prisma.user.findUnique({ where: { id } });
+    const user = await prisma.user.findUnique({ where: { id }, select: userFields });
     if (!user) throw new NotFoundExcpetion('User not found');
 
     // 3- Check if username exists in another record
@@ -83,7 +97,8 @@ export async function update(actorId: string, id: string, data: any, profileImag
                 not: id
             },
             username: data.username
-        }
+        },
+        select: userFields
     })
     if (usersWithSameUsername.length > 0) throw new ConflictException('Username already exists');
 
@@ -100,10 +115,16 @@ export async function update(actorId: string, id: string, data: any, profileImag
         bio: data.bio,
     }
     if (profileImageUrl) dataToUpdate.profilePhoto = profileImageUrl;
-    const updatedUser = await prisma.user.update({
+    let updatedUser: Partial<User> = await prisma.user.update({
         where: { id },
-        data: dataToUpdate
+        data: dataToUpdate,
+        select: userFields,
     })
+    // updatedUser = sanitizeUser(updatedUser as User);
+
+    // 6- Updating cache
+    const redisKey = `user:${id}`;
+    await redisClient.setEx(redisKey, 1800, JSON.stringify(updatedUser));
 
     return updatedUser;
 }
@@ -113,7 +134,7 @@ export async function update(actorId: string, id: string, data: any, profileImag
  */
 export async function updatePassword(actorId: string, data: any) {
     // 1- Check if user exists
-    const user = await prisma.user.findUnique({ where: { id: actorId } });
+    const user = await prisma.user.findUnique({ where: { id: actorId }, select: userFields });
     if (!user) throw new NotFoundExcpetion('User not found');
 
     // 2- Hash the password
@@ -130,7 +151,7 @@ export async function updatePassword(actorId: string, data: any) {
         }
     })
 
-    return sanitizeUser(user);
+    return user;
 }
 
 /**
@@ -138,7 +159,7 @@ export async function updatePassword(actorId: string, data: any) {
  */
 export async function updateUserAcdemicYear(actorId: string, data: any) {
     // 1- Check if user exists
-    const user = await prisma.user.findUnique({ where: { id: actorId } });
+    const user = await prisma.user.findUnique({ where: { id: actorId }, select: userFields });
     if (!user) throw new NotFoundExcpetion('User not found');
 
     // 2- Update academic year
@@ -148,8 +169,13 @@ export async function updateUserAcdemicYear(actorId: string, data: any) {
         },
         data: {
             academicYear: data.academicYear
-        }
+        },
+        select: userFields
     })
 
-    return sanitizeUser(userToReturn);
+    // 3- Setting cache
+    const redisKey = `user:${actorId}`;
+    await redisClient.setEx(redisKey, 1800, JSON.stringify(userToReturn));
+
+    return userToReturn;
 }
