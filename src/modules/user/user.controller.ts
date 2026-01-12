@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { BadRequestExcpetion } from '../../../core/errors/BadRequestException.js';
 import * as userService from './user.service.js';
-import { setCache } from '../../helpers/cache.helper.js';
 
 /**
  * GET /api/users
@@ -14,13 +13,14 @@ export async function getusersController(req: Request, res: Response) {
 
     const data = await userService.getAll(cursor, limit);
 
-    // Set in cache
-    setCache(req, false, data, 1800);
-    res.setHeader('X-Cache', 'MISS');
+    // Setting cache headers
+    if (data.cache) res.setHeader('X-Cache', 'HIT')
+    else res.setHeader('X-Cache', 'MISS')
+
     res.json({
         success: true,
         message: "users retrieved successfully",
-        data
+        data: data.data
     });
 }
 
@@ -33,12 +33,15 @@ export async function getuserByIdController(req: Request, res: Response) {
 
     const data = await userService.getById(id);
 
-    setCache(req, false, data, 1800);
-    res.setHeader('X-Cache', 'MISS');
+    // Setting cache headers
+    if (data.cache) res.setHeader('X-Cache', 'HIT');
+    else res.setHeader('X-Cache', 'MISS');
+
+
     res.json({
         success: true,
         message: "user retrieved successfully",
-        data
+        data: data.data
     });
 }
 

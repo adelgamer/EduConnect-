@@ -8,7 +8,7 @@ import { Options } from 'swagger-jsdoc';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { limiter } from './core/middlewares/rateLimiter.js';
-import { checkCache } from './core/middlewares/cacheMiddleware.js';
+import fs from 'fs';
 
 const app = express();
 const port = 3001;
@@ -17,8 +17,7 @@ const port = 3001;
 app.use(express.json());
 app.use(cookieParser());
 app.use(baseMiddleware);
-// app.use(limiter(1, 60));
-app.use(checkCache);
+app.use(limiter(1, 60));
 
 // Routes
 app.use(mainRouter);
@@ -55,6 +54,7 @@ export const swaggerOptions: Options = {
 };
 const specs = swaggerJsdoc(swaggerOptions);
 app.use(process.env.SWAGGER_ENDPOINT ?? '/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+fs.writeFileSync('./swagger.json', JSON.stringify(specs), 'utf-8');
 
 
 app.listen(port, () => {

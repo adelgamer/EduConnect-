@@ -6,11 +6,17 @@ import bycrypt from 'bcrypt'
 import { sanitizeUser } from "../../helpers/user.helper.js";
 import { BadRequestExcpetion } from "../../../core/errors/BadRequestException.js";
 import { User } from "../../../generated/prisma/client.js";
+import { redisClient } from "../../../core/redis/redis.client.js";
 
 /**
  * Fetches all user data.
  */
 export async function getAll(cursor: string, limit: number) {
+
+    // Checking cache
+    const redisKey: string = `users:${cursor}:${limit}`;
+    let response: any = await redisClient.get(redisKey);
+    if (response) return { cache: true, data: JSON.parse(response) };
 
     const query: any = {
         take: limit + 1,
@@ -32,18 +38,31 @@ export async function getAll(cursor: string, limit: number) {
         users.pop();
     };
 
-    return { users, pagination: { hasNextPage, nextCursor, count: users.length } };
+    // Setting cache and returning response
+    response = { cache: false, data: { users, pagination: { hasNextPage, nextCursor, count: users.length } } };
+    await redisClient.setEx(redisKey, 1800, JSON.stringify(response.data))
+
+    return response;
 }
 
 /**
  * Fetches a single user by ID.
  */
 export async function getById(id: string) {
+    // Checking cache
+    const redisKey = `user:${id}`;
+    let response: any = await redisClient.get(redisKey);
+    if (response) return { cache: true, data: JSON.parse(response) }
+
     // 1- Getting user and checking if exists
     const user = await prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundExcpetion('User not found');
 
-    return user;
+    // Setting cache
+    response = { cache: false, data: user }
+    await redisClient.setEx(redisKey, 1800, JSON.stringify(response.data))
+
+    return response;
 }
 
 /**
