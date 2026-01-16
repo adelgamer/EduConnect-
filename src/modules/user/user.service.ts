@@ -7,6 +7,12 @@ import { sanitizeUser } from "../../helpers/user.helper.js";
 import { BadRequestExcpetion } from "../../../core/errors/BadRequestException.js";
 import { User } from "../../../generated/prisma/client.js";
 import { redisClient } from "../../../core/redis/redis.client.js";
+import { s3Client } from "../../../core/cloudStorage/s3Client.js";
+import { randomUUID } from "crypto";
+import path from "path";
+import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import fs from "fs/promises";
 
 export const userFields = {
     id: true,
@@ -50,6 +56,19 @@ export async function getAll(cursor: string, limit: number) {
         users.pop();
     };
 
+    // Getting images
+    for (const user of users) {
+        if (!user.profilePhoto) continue;
+
+        const command = new GetObjectCommand({
+            Key: user.profilePhoto,
+            Bucket: "edu-connect",
+        });
+        user.profilePhoto = await getSignedUrl(s3Client, command, {
+            expiresIn: 1800
+        })
+    }
+
     // Setting cache and returning response
     response = { cache: false, data: { users, pagination: { hasNextPage, nextCursor, count: users.length } } };
     await redisClient.setEx(redisKey, 1800, JSON.stringify(response.data))
@@ -71,6 +90,17 @@ export async function getById(id: string) {
         where: { id }, select: userFields
     });
     if (!user) throw new NotFoundExcpetion('User not found');
+
+    // Getting image
+    if (user.profilePhoto) {
+        const command = new GetObjectCommand({
+            Key: user.profilePhoto,
+            Bucket: "edu-connect",
+        });
+        user.profilePhoto = await getSignedUrl(s3Client, command, {
+            expiresIn: 1800
+        })
+    }
 
     // Setting cache
     response = { cache: false, data: user }
@@ -114,13 +144,43 @@ export async function update(actorId: string, id: string, data: any, profileImag
         username: data.username,
         bio: data.bio,
     }
-    if (profileImageUrl) dataToUpdate.profilePhoto = profileImageUrl;
-    let updatedUser: Partial<User> = await prisma.user.update({
+    if (profileImageUrl) {
+        // creating s3 command
+        const key = `user/${id}/avatar/${randomUUID()}${path.extname(profileImage!.originalname)}`;
+
+        // Since we are using diskStorage, we must read the file from disk
+        const fileBuffer = await fs.readFile(profileImage!.path);
+
+        const command = new PutObjectCommand({
+            Key: key,
+            Bucket: 'edu-connect',
+            Body: fileBuffer,
+            ContentType: profileImage!.mimetype
+        })
+
+        await s3Client.send(command);
+        dataToUpdate.profilePhoto = key;
+
+        // Clean up: remove the local file after uploading to S3
+        await fs.unlink(profileImage!.path).catch(err => console.error("Failed to delete local image:", err));
+    }
+
+    let updatedUser: any = await prisma.user.update({
         where: { id },
         data: dataToUpdate,
         select: userFields,
     })
-    // updatedUser = sanitizeUser(updatedUser as User);
+
+    // Generating signed URL for the response
+    if (updatedUser.profilePhoto) {
+        const command = new GetObjectCommand({
+            Key: updatedUser.profilePhoto,
+            Bucket: "edu-connect",
+        });
+        updatedUser.profilePhoto = await getSignedUrl(s3Client, command, {
+            expiresIn: 1800
+        })
+    }
 
     // 6- Updating cache
     const redisKey = `user:${id}`;
