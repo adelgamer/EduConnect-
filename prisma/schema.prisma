@@ -48,7 +48,7 @@ model RefreshToken {
 
   userId    String
   User      User     @relation(fields: [userId], references: [id])
-  token     String   @unique
+  token     String   @unique @db.VarChar(512)
   expiresAt DateTime
 
   createdAt DateTime @default(now())
